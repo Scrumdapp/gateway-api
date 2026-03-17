@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: test_route
+              uri: http://127.0.0.1:3000/
+              predicates:
+                - Path=/groups/*
