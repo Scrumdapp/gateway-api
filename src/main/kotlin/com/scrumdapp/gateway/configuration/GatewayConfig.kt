@@ -2,6 +2,7 @@ package com.scrumdapp.gateway.configuration
 
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri
+import org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http
 import org.springframework.context.annotation.Bean
@@ -37,7 +38,7 @@ class GatewayConfig {
             route()
                 .add(route("groups")
                     .GET("/api/groups/**", http())
-                    .before(uri("http://127.0.0.1:3000"))
+                    .filter(lb("Checkin-Service"))
                     .build()
                 )
                 .add(route("users")
