@@ -1,9 +1,11 @@
 package com.scrumdapp.gateway.handlers
 
+import com.scrumdapp.gateway.handlers.exceptions.NoAccessException
+import com.scrumdapp.gateway.handlers.exceptions.NotAuthorizedException
+import com.scrumdapp.gateway.handlers.exceptions.ServerFaultException
 import com.scrumdapp.gateway.services.DiscordService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpStatus
 import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService
@@ -33,7 +35,7 @@ class OAuthCallbackHandler(
                 token.name
             )
             //TODO(Add error handling here)
-            if (client.refreshToken == null) throw RuntimeException("No refresh token")
+            if (client.refreshToken == null) throw NotAuthorizedException()
 
             val accessToken = client.accessToken.tokenValue
 
@@ -43,13 +45,13 @@ class OAuthCallbackHandler(
             val tokenExpiry = s.format(Date()) + client.refreshToken?.expiresAt
 
             val discordUser = discordService.getUser(accessToken).getOrElse {
-                throw RuntimeException("Could not fetch user")
+                throw ServerFaultException(message = "Could not fetch user from Discord")
             }
 
             //TODO(Add env for authorized guild)
             val result = discordService.isInServer(accessToken, "123")
             if (!result) {
-                throw RuntimeException("You're not authorized to access this resource")
+                throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }
 
             // Update shit within user db
