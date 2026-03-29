@@ -22,7 +22,7 @@ class RuntimeExceptionHandler(
     val logger = LoggerFactory.getLogger(this.javaClass)
 
     @ExceptionHandler(Exception::class)
-    public fun handleRuntimeException(exception: Exception): ResponseEntity<ApiError> {
+     fun handleRuntimeException(exception: Exception): ResponseEntity<ApiError> {
 
         if (exception is ApplicationException && exception.enableLogging) {
             logger.error(exception.code.toString(), exception.message, exception.stackTrace)
