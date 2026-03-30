@@ -1,8 +1,6 @@
 package com.scrumdapp.gateway.configuration
 
 import com.scrumdapp.gateway.handlers.exceptions.CustomAuthenticationEntryPoint
-import com.scrumdapp.gateway.handlers.exceptions.RuntimeExceptionHandler
-import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

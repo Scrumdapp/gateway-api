@@ -1,5 +1,8 @@
 package com.scrumdapp.gateway.handlers.exceptions
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import org.springframework.security.core.AuthenticationException
+
 class NotAuthorizedException(
     override val code: Int = 401,
     override val message: String = "Not authorized",
@@ -20,3 +23,16 @@ class ServerFaultException(
     override val message: String = "Unexpected server error",
     override val enableLogging: Boolean = true
 ): ApplicationException(code, message, enableLogging)
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
+data class ApiResponse(val code: Int, val message: String, val stackTrace: String? = null)
+
+open class ApplicationException(
+    open val code: Int,
+    override val message: String,
+    open val enableLogging: Boolean = false
+): RuntimeException()
+
+class ApplicationAuthenticationException(
+    appException: ApplicationException
+): AuthenticationException(appException.message)

@@ -1,6 +1,5 @@
 package com.scrumdapp.gateway.handlers.exceptions
 
-import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.scrumdapp.gateway.utils.ExceptionUtils
 import jakarta.servlet.ServletException
@@ -16,21 +15,8 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.stereotype.Component
 import java.io.IOException
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-data class ApiResponse(val code: Int, val message: String, val stackTrace: String? = null)
-
-open class ApplicationException(
-    open val code: Int,
-    override val message: String,
-    open val enableLogging: Boolean = false
-): RuntimeException()
-
-class ApplicationAuthenticationException(
-    appException: ApplicationException
-): AuthenticationException(appException.message)
-
 @Component
-class RuntimeExceptionHandler(
+class CustomAuthenticationFailureHandler(
     private val exceptionUtils: ExceptionUtils,
     private val logger: Logger = LoggerFactory.getLogger(ApplicationException::class.java)
 ): AuthenticationFailureHandler {
