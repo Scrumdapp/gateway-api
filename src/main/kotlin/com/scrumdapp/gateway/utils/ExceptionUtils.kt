@@ -1,24 +1,24 @@
 package com.scrumdapp.gateway.utils
 
-import com.scrumdapp.gateway.handlers.exceptions.ApiError
+import com.scrumdapp.gateway.handlers.exceptions.ApiResponse
 import com.scrumdapp.gateway.handlers.exceptions.ApplicationException
 import org.springframework.stereotype.Component
 
 interface ExceptionUtils {
-    fun exceptionFromThrowable(throwable: Throwable): ApiError
-    fun Throwable.toExceptionContent(): ApiError
+    fun exceptionFromThrowable(throwable: Throwable): ApiResponse
+    fun Throwable.toExceptionContent(): ApiResponse
 }
 
 @Component
 class ExceptionUtilsImpl: ExceptionUtils {
-    override fun exceptionFromThrowable(throwable: Throwable): ApiError {
+    override fun exceptionFromThrowable(throwable: Throwable): ApiResponse {
         return when (throwable) {
-            is ApplicationException -> ApiError(
+            is ApplicationException -> ApiResponse(
                 code = throwable.code,
                 message = throwable.message,
                 stackTrace = throwable.stackTraceToString()
             )
-            else -> ApiError(
+            else -> ApiResponse(
                 code = 500,
                 message = throwable.message ?: "Unknown server error",
                 stackTrace = throwable.stackTraceToString()
@@ -26,7 +26,7 @@ class ExceptionUtilsImpl: ExceptionUtils {
         }
     }
 
-    override fun Throwable.toExceptionContent(): ApiError {
+    override fun Throwable.toExceptionContent(): ApiResponse {
         return exceptionFromThrowable(this)
     }
 }

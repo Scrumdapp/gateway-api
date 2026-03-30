@@ -1,17 +1,24 @@
 package com.scrumdapp.gateway.configuration
 
+import com.scrumdapp.gateway.handlers.exceptions.CustomAuthenticationEntryPoint
+import com.scrumdapp.gateway.handlers.exceptions.RuntimeExceptionHandler
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 
 @Configuration
-class SecurityConfig {
+class SecurityConfig(
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
+    private val authenticationSuccessHandler: AuthenticationSuccessHandler,
+    private val authenticationFailureHandler: AuthenticationFailureHandler
+) {
 
     @Bean
-    fun securityFilterChain(http: HttpSecurity, successHandler: AuthenticationSuccessHandler): SecurityFilterChain {
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
@@ -20,12 +27,11 @@ class SecurityConfig {
             }
             .oauth2Login { oauth2 -> oauth2
                 .loginPage("/oauth2/authorization/discord")
-                .successHandler(successHandler)
+                .successHandler(authenticationSuccessHandler)
+                .failureHandler(authenticationFailureHandler)
             }
-            .exceptionHandling { exceptions ->
-                exceptions.authenticationEntryPoint { request, response, authException ->
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, authException.message)
-                }
+            .exceptionHandling { h ->
+                h.authenticationEntryPoint(customAuthenticationEntryPoint)
             }
             .logout {logout -> logout.logoutSuccessUrl("/")}
 
