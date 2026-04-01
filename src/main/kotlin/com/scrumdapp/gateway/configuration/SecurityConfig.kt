@@ -22,7 +22,7 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/login/**", "/oauth2/**").permitAll()
+                it.requestMatchers("/login/**", "/logoutsuccessful", "/oauth2/**").permitAll()
                 it.requestMatchers("/error").permitAll()
                 it.anyRequest().authenticated()
             }
@@ -35,7 +35,7 @@ class SecurityConfig(
                 h.authenticationEntryPoint(customAuthenticationEntryPoint)
                 h.accessDeniedHandler(customAccessDeniedHandler)
             }
-            .logout {logout -> logout.logoutSuccessUrl("/")}
+            .logout {logout -> logout.logoutSuccessUrl("/logoutsuccessful")}
 
         return http.build()
     }
