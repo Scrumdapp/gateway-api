@@ -1,6 +1,7 @@
 package com.scrumdapp.gateway.configuration
 
-import com.scrumdapp.gateway.handlers.exceptions.CustomAuthenticationEntryPoint
+import com.scrumdapp.gateway.handlers.exceptions.CustomAccessDeniedHandler
+import com.scrumdapp.gateway.handlers.exceptions.CustomAuthenticationEntrypoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -10,7 +11,8 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 @Configuration
 class SecurityConfig(
-    private val customAuthenticationEntryPoint: CustomAuthenticationEntryPoint,
+    private val customAuthenticationEntryPoint: CustomAuthenticationEntrypoint,
+    private val customAccessDeniedHandler: CustomAccessDeniedHandler,
     private val authenticationSuccessHandler: AuthenticationSuccessHandler,
     private val authenticationFailureHandler: AuthenticationFailureHandler
 ) {
@@ -21,6 +23,7 @@ class SecurityConfig(
             .csrf { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/login/**", "/oauth2/**").permitAll()
+                it.requestMatchers("/error").permitAll()
                 it.anyRequest().authenticated()
             }
             .oauth2Login { oauth2 -> oauth2
@@ -30,6 +33,7 @@ class SecurityConfig(
             }
             .exceptionHandling { h ->
                 h.authenticationEntryPoint(customAuthenticationEntryPoint)
+                h.accessDeniedHandler(customAccessDeniedHandler)
             }
             .logout {logout -> logout.logoutSuccessUrl("/")}
 
