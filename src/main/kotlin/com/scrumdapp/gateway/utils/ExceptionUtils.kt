@@ -38,9 +38,9 @@ class ExceptionUtilsImpl(
     override fun logException(throwable: Throwable)
     {
         if (throwable is ApplicationException && throwable.enableLogging) {
-            logger.error("${throwable.code} - ${throwable.message}", throwable.stackTrace)
+            logger.error("${throwable.code} - ${throwable.message}", throwable)
         } else {
-            logger.error(throwable.message, throwable.stackTrace)
+            logger.error(throwable.message, throwable)
         }
 
     }

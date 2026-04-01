@@ -16,23 +16,7 @@ import org.springframework.web.servlet.function.ServerResponse
 class GatewayConfig {
 
     @Bean
-    fun sessionCookieFilter(): HandlerFilterFunction<ServerResponse, ServerResponse> {
-        return HandlerFilterFunction { request, next ->
-
-            val sessionToken = request.cookies().getFirst("SessionToken")?.value
-
-//            if (sessionToken.isNullOrBlank()) {
-//                return@HandlerFilterFunction ServerResponse.status(HttpStatus.UNAUTHORIZED).build()
-//            }
-
-            // Do something with databases or user service here. Maybe it is cleaner if we handle session tokens here and add information from userservice.
-
-            next.handle(request)
-        }
-    }
-
-    @Bean
-    fun gatewayRoutes(sessionCookieFilter: HandlerFilterFunction<ServerResponse, ServerResponse>): RouterFunction<ServerResponse> {
+    fun gatewayRoutes(): RouterFunction<ServerResponse> {
 
         val routes: RouterFunction<ServerResponse> =
             route()
@@ -49,7 +33,6 @@ class GatewayConfig {
                 .before(rewritePath("/api/(?<segment>.*)", $$"/${segment}"))
             .build()
 
-
-        return routes.filter(sessionCookieFilter)
+       return routes
     }
 }

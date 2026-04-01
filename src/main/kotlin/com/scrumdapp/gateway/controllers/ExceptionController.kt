@@ -21,9 +21,8 @@ class ExceptionController: ErrorController {
         when (statusCode) {
             401 -> throw NotAuthorizedException()
             403 -> throw NoAccessException()
-            404 -> throw NotFoundException(enableLogging = true)
+            404 -> throw NotFoundException()
             500 -> throw ServerFaultException()
-            503 -> throw ServerFaultException(code = 503)
             else -> throw ServerFaultException()
         }
     }
