@@ -15,7 +15,7 @@ class NoAccessException(
 
 class NotFoundException(
     override val code: Int = 404,
-    override val message: String = "Not found",
+    override val message: String = "Resource not found",
     override val enableLogging: Boolean = false
 ): ApplicationException(code, message)
 

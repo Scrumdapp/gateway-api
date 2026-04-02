@@ -88,7 +88,7 @@ class CustomAccessDeniedHandler(
                 response.status = HttpStatus.FORBIDDEN.value()
                 body = ApiResponse(
                     HttpStatus.FORBIDDEN.value(),
-                    accessDeniedException.message?: "Unknown error",
+                    accessDeniedException.message?: "Forbidden",
                 )
             }
             ObjectMapper().writeValue(response.outputStream, body)
