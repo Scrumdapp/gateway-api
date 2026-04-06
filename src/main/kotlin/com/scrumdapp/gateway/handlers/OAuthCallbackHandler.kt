@@ -66,6 +66,9 @@ class OAuthCallbackHandler(
 
                 // Update shit within user db
 
+                // Creates JWT token
+                val token =
+
                 response.status = HttpStatus.OK.value()
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
                 ObjectMapper().writeValue(response.outputStream, ApiResponse(code = 200, "login successful"))
