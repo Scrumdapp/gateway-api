@@ -1,33 +1,46 @@
 package com.scrumdapp.gateway.services
 
-import org.springframework.security.oauth2.jwt.Jwt
+import com.nimbusds.jose.jwk.source.ImmutableSecret
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm
+import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
-import java.security.Key
 import java.time.Instant
-import java.util.Base64
-import javax.crypto.KeyGenerator
-import javax.crypto.SecretKey
+import java.util.function.Consumer
 import javax.crypto.spec.SecretKeySpec
 
-@Service
-class JwtService {
+@Configuration
+class JwtConfig {
 
-    private fun generateKey(): SecretKey {
-        val gen = Base64.getDecoder().decode("MEH")
-        val key: SecretKey = SecretKeySpec(gen, 0, gen.size, "AES")
-        return key
+    @Bean
+    fun jwtEncoder(): JwtEncoder {
+        val secret = "c2hvd2JyaW5ndmVnZXRhYmxlaW1wb3J0YW50ZXhwZXI=".toByteArray()
+        val key = SecretKeySpec(secret, "HmacSHA256")
+        return NimbusJwtEncoder(ImmutableSecret(key))
     }
-    public fun generateJwt(subject: String, claims: Map<String, Any>): Jwt {
-        val jwt = Jwt.Builder("meh")
+}
 
+@Service
+class JwtService(
+    private val jwtEncoder: JwtEncoder,
+) {
+     fun generateJwtToken(
+        subject: String, claims: Map<String, Any>): String {
 
-
-        return Jwt.Builder
+        val jwtClaim = JwtClaimsSet.builder()
+            .issuer("gateway")
             .subject(subject)
-            .claims { claims.toMutableMap() }
             .issuedAt(Instant.now())
-            .expiresAt(Instant.now().plusSeconds(60 * 2)) // 2 minutes
-            .tokenValue(generateKey().toString())
+            .expiresAt(Instant.now().plusSeconds(60 * 2))
+            .claims { it.putAll(claims) }
             .build()
+
+        val headers = JwsHeader.with(MacAlgorithm.HS256).build()
+
+        val encoderParams = JwtEncoderParameters.from(headers, jwtClaim)
+        val jwt = jwtEncoder.encode(encoderParams )
+
+        return jwt.tokenValue
     }
 }

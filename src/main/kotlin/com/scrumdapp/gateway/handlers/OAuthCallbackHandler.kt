@@ -8,6 +8,7 @@ import com.scrumdapp.gateway.handlers.exceptions.NoAccessException
 import com.scrumdapp.gateway.handlers.exceptions.NotAuthorizedException
 import com.scrumdapp.gateway.handlers.exceptions.ServerFaultException
 import com.scrumdapp.gateway.services.DiscordService
+import com.scrumdapp.gateway.services.JwtService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -29,6 +30,7 @@ import java.util.TimeZone
 class OAuthCallbackHandler(
     private val failureHandler: AuthenticationFailureHandler,
     private val authorizedClientService: OAuth2AuthorizedClientService,
+    private val jwtService: JwtService,
     private val discordService: DiscordService,
     @Value($$"${DISCORD_ALLOWED_GUILD}") private val allowedGuild: String
 ): AuthenticationSuccessHandler  {
@@ -67,7 +69,11 @@ class OAuthCallbackHandler(
                 // Update shit within user db
 
                 // Creates JWT token
-                val token =
+                val token = jwtService.generateJwtToken("test", mapOf("user_id" to 24, "user_groups" to 1))
+
+                println(token)
+
+                request.setAttribute("jwt", token)
 
                 response.status = HttpStatus.OK.value()
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
