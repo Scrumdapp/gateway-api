@@ -1,6 +1,7 @@
 package com.scrumdapp.gateway.services
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
@@ -14,8 +15,10 @@ import javax.crypto.spec.SecretKeySpec
 class JwtConfig {
 
     @Bean
-    fun jwtEncoder(): JwtEncoder {
-        val secret = "c2hvd2JyaW5ndmVnZXRhYmxlaW1wb3J0YW50ZXhwZXI=".toByteArray()
+    fun jwtEncoder(
+        @Value($$"${JWT_SECRET}") secret: String
+    ): JwtEncoder {
+        val secret = secret.toByteArray()
         val key = SecretKeySpec(secret, "HmacSHA256")
         return NimbusJwtEncoder(ImmutableSecret(key))
     }
@@ -24,12 +27,13 @@ class JwtConfig {
 @Service
 class JwtService(
     private val jwtEncoder: JwtEncoder,
+    @Value("\${spring.application.name}") private val applicationName: String,
 ) {
      fun generateJwtToken(
         subject: String, claims: Map<String, Any>): String {
 
         val jwtClaim = JwtClaimsSet.builder()
-            .issuer("gateway")
+            .issuer(applicationName)
             .subject(subject)
             .issuedAt(Instant.now())
             .expiresAt(Instant.now().plusSeconds(60 * 2))

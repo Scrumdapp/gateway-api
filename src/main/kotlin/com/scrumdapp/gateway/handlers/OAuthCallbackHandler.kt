@@ -54,6 +54,7 @@ class OAuthCallbackHandler(
 
                 val s = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
                 s.timeZone = TimeZone.getTimeZone("GMT")
+
                 //TODO(Add expiry time here)
                 val tokenExpiry = s.format(Date()) + client.refreshToken?.expiresAt
 
@@ -66,7 +67,7 @@ class OAuthCallbackHandler(
                     throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
                 }
 
-                // Update shit within user db
+                //TODO( Update shit within user db )
 
                 // Creates JWT token
                 val token = jwtService.generateJwtToken("test", mapOf("user_id" to 24, "user_groups" to 1))
@@ -79,6 +80,8 @@ class OAuthCallbackHandler(
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
                 ObjectMapper().writeValue(response.outputStream, ApiResponse(code = 200, "login successful"))
             } else {
+
+                //TODO(error not thrown properly here
                 throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }
         } catch (exception: ApplicationException) {
