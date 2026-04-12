@@ -70,7 +70,11 @@ class OAuthCallbackHandler(
                 //TODO( Update shit within user db )
 
                 // Creates JWT token
+                val start = System.nanoTime()
+
                 val token = jwtService.generateJwtToken("test", mapOf("user_id" to 24, "user_groups" to 1))
+
+                println("Time to gen token ${(System.nanoTime() - start) - 1_000_000.0} ms")
 
                 println(token)
 
