@@ -1,0 +1,65 @@
+package com.scrumdapp.gateway.gatewayfilters
+
+import com.scrumdapp.gateway.services.JwtService
+import org.springframework.http.HttpHeaders
+import org.springframework.stereotype.Component
+import org.springframework.web.servlet.function.HandlerFilterFunction
+import org.springframework.web.servlet.function.HandlerFunction
+import org.springframework.web.servlet.function.ServerRequest
+import org.springframework.web.servlet.function.ServerResponse
+import java.time.Instant
+
+data class JwtToken(
+    val token: String,
+    val expiresAt: Instant
+) {
+    fun isExpired(): Boolean {
+        return Instant.now().isAfter(expiresAt)
+    }
+}
+
+@Component
+class JwtFilters(
+    private val jwtService: JwtService
+) {
+
+    public fun filterJwtSession(): HandlerFilterFunction<ServerResponse, ServerResponse> {
+        println("Hit this filter")
+
+        return HandlerFilterFunction { req: ServerRequest, next: HandlerFunction<ServerResponse> ->
+            val time = System.nanoTime()
+
+            val session = req.session()
+            var cachedToken = session.getAttribute("JWT_AC_TOKEN") as? JwtToken
+
+            if (cachedToken == null || cachedToken.isExpired()) {
+                cachedToken = generateNewToken()
+                session.setAttribute("JWT_AC_TOKEN", cachedToken)
+            }
+
+            val mutatedReq = ServerRequest.from(req)
+                .headers {
+                    // Session has been validated at this point in the chain
+                    it.remove(HttpHeaders.COOKIE)
+                    it.setBearerAuth(cachedToken.token)
+                }
+                .build()
+
+            println("Time to gen token ${(System.nanoTime() - time)} ms")
+
+            val response = next.handle(mutatedReq)
+            response
+        }
+    }
+
+    private fun generateNewToken(): JwtToken {
+        val expiresAt = Instant.now().plusSeconds(60*15)
+
+        val token = jwtService.generateJwtToken(
+            subject = "name",
+            claims = mapOf("userId" to 24, "user_groups" to 1) //TODO( Change this some real logic )
+        )
+
+        return JwtToken(token, expiresAt)
+    }
+}

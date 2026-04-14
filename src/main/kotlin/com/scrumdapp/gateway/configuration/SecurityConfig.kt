@@ -22,7 +22,7 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/login/**", "/logoutsuccessful", "/oauth2/**").permitAll()
+                it.requestMatchers("/login/**", "/logoutsuccessful", "/oauth2/**", "/.well-known/jwks.json").permitAll()
                 it.requestMatchers("/error").permitAll()
                 it.anyRequest().authenticated()
             }

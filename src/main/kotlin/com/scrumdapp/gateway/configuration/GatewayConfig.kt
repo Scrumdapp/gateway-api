@@ -1,5 +1,6 @@
 package com.scrumdapp.gateway.configuration
 
+import com.scrumdapp.gateway.gatewayfilters.JwtFilters
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath
 import org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route
@@ -14,13 +15,17 @@ import org.springframework.web.servlet.function.ServerResponse
 class GatewayConfig {
 
     @Bean
-    fun gatewayRoutes(): RouterFunction<ServerResponse> {
+    fun gatewayRoutes(
+        jwtFilters: JwtFilters
+    ): RouterFunction<ServerResponse> {
 
         val routes: RouterFunction<ServerResponse> =
             route()
+                .filter(jwtFilters.filterJwtSession())
                 .add(route("groups")
                     .GET("/api/groups/**", http())
-                    .filter(lb("Checkin-Service"))
+                    //.filter(lb("Checkin-Service"))
+
                     .build()
                 )
                 .add(route("users")

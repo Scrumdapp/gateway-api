@@ -1,5 +1,7 @@
 package com.scrumdapp.gateway.controllers
 
+import com.nimbusds.jose.jwk.JWKSet
+import com.nimbusds.jose.jwk.RSAKey
 import com.scrumdapp.gateway.handlers.exceptions.ApiResponse
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -8,7 +10,9 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.view.RedirectView
 
 @RestController
-class GatewayController {
+class GatewayController(
+    private val rsaKey: RSAKey
+) {
 
     @GetMapping("/login")
     fun loginRedirect(): RedirectView {
@@ -16,11 +20,17 @@ class GatewayController {
     }
 
     @GetMapping("/logoutsuccessful")
-    fun logoutRedirect(): ResponseEntity<ApiResponse> {
+    fun logoutRedirect(): ApiResponse {
         val body = ApiResponse(
             code = HttpStatus.OK.value(),
             message = "Logout successful"
         )
-        return ResponseEntity.status(HttpStatus.OK.value()).body(body)
+        return body
+    }
+
+    @GetMapping("/.well-known/jwks.json")
+    fun keys(): Map<String, Any> {
+        val jwk = rsaKey.toPublicJWK().toJSONObject()
+        return jwk
     }
 }
