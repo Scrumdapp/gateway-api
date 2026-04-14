@@ -24,11 +24,8 @@ class JwtFilters(
 ) {
 
     public fun filterJwtSession(): HandlerFilterFunction<ServerResponse, ServerResponse> {
-        println("Hit this filter")
 
         return HandlerFilterFunction { req: ServerRequest, next: HandlerFunction<ServerResponse> ->
-            val time = System.nanoTime()
-
             val session = req.session()
             var cachedToken = session.getAttribute("JWT_AC_TOKEN") as? JwtToken
 
@@ -45,19 +42,17 @@ class JwtFilters(
                 }
                 .build()
 
-            println("Time to gen token ${(System.nanoTime() - time)} ms")
-
             val response = next.handle(mutatedReq)
             response
         }
     }
 
     private fun generateNewToken(): JwtToken {
-        val expiresAt = Instant.now().plusSeconds(60*15)
+        val expiresAt = Instant.now().plusSeconds(60*5)
 
         val token = jwtService.generateJwtToken(
             subject = "name",
-            claims = mapOf("userId" to 24, "user_groups" to 1) //TODO( Change this some real logic )
+            claims = mapOf("userId" to 24, "user_groups" to 1, "roles" to listOf("STUDENT")) //TODO( Change this some real logic )
         )
 
         return JwtToken(token, expiresAt)

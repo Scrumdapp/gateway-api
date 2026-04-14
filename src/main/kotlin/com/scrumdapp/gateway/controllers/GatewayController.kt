@@ -30,7 +30,8 @@ class GatewayController(
 
     @GetMapping("/.well-known/jwks.json")
     fun keys(): Map<String, Any> {
-        val jwk = rsaKey.toPublicJWK().toJSONObject()
+        val jwk = JWKSet(rsaKey).toPublicJWKSet().toJSONObject()
+
         return jwk
     }
 }

@@ -24,7 +24,7 @@ class GatewayConfig {
                 .filter(jwtFilters.filterJwtSession())
                 .add(route("groups")
                     .GET("/api/groups/**", http())
-                    //.filter(lb("Checkin-Service"))
+                    .filter(lb("CHECKPOINT-SERVICE"))
 
                     .build()
                 )
