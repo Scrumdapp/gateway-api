@@ -19,7 +19,7 @@ class ExceptionUtilsImpl(
     override fun exceptionFromThrowable(throwable: Throwable): ApiResponse {
         return when (throwable) {
             is ApplicationException -> ApiResponse(
-                code = throwable.code,
+                code = throwable.code.value(),
                 message = throwable.message,
                 stackTrace = throwable.stackTraceToString()
             )
