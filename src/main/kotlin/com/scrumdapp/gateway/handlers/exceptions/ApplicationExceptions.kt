@@ -16,12 +16,17 @@ class NoAccessException(
 class NotFoundException(
     override val code: Int = 404,
     override val message: String = "Resource not found",
-    override val enableLogging: Boolean = false
 ): ApplicationException(code, message)
 
 class ServerFaultException(
     override val code: Int = 500,
     override val message: String = "Unexpected server error",
+    override val enableLogging: Boolean = true
+): ApplicationException(code, message, enableLogging)
+
+class ServiceUnavailableException(
+    override val code: Int = 503,
+    override val message: String = "Service not available",
     override val enableLogging: Boolean = true
 ): ApplicationException(code, message, enableLogging)
 

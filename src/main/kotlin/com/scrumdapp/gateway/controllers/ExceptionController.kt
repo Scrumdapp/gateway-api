@@ -4,6 +4,7 @@ import com.scrumdapp.gateway.handlers.exceptions.NoAccessException
 import com.scrumdapp.gateway.handlers.exceptions.NotAuthorizedException
 import com.scrumdapp.gateway.handlers.exceptions.NotFoundException
 import com.scrumdapp.gateway.handlers.exceptions.ServerFaultException
+import com.scrumdapp.gateway.handlers.exceptions.ServiceUnavailableException
 import jakarta.servlet.RequestDispatcher
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.boot.webmvc.error.ErrorController
@@ -23,6 +24,7 @@ class ExceptionController: ErrorController {
             403 -> throw NoAccessException()
             404 -> throw NotFoundException()
             500 -> throw ServerFaultException()
+            503 -> throw ServiceUnavailableException()
             else -> throw ServerFaultException()
         }
     }

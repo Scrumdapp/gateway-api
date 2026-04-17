@@ -1,6 +1,7 @@
 package com.scrumdapp.gateway.gatewayfilters
 
 import com.scrumdapp.gateway.services.JwtService
+import jakarta.servlet.http.HttpSession
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.function.HandlerFilterFunction
@@ -19,18 +20,18 @@ data class JwtToken(
 }
 
 @Component
-class JwtFilters(
+class PassportFilters(
     private val jwtService: JwtService
 ) {
 
-    public fun filterJwtSession(): HandlerFilterFunction<ServerResponse, ServerResponse> {
+    fun insertPassport(): HandlerFilterFunction<ServerResponse, ServerResponse> {
 
         return HandlerFilterFunction { req: ServerRequest, next: HandlerFunction<ServerResponse> ->
             val session = req.session()
             var cachedToken = session.getAttribute("JWT_AC_TOKEN") as? JwtToken
 
             if (cachedToken == null || cachedToken.isExpired()) {
-                cachedToken = generateNewToken()
+                cachedToken = generateNewPassport(session)
                 session.setAttribute("JWT_AC_TOKEN", cachedToken)
             }
 
@@ -47,7 +48,7 @@ class JwtFilters(
         }
     }
 
-    private fun generateNewToken(): JwtToken {
+    private fun generateNewPassport(session: HttpSession): JwtToken {
         val expiresAt = Instant.now().plusSeconds(60*5)
 
         val token = jwtService.generateJwtToken(

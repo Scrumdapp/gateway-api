@@ -1,6 +1,6 @@
 package com.scrumdapp.gateway.configuration
 
-import com.scrumdapp.gateway.gatewayfilters.JwtFilters
+import com.scrumdapp.gateway.gatewayfilters.PassportFilters
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath
 import org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route
@@ -17,12 +17,12 @@ class GatewayConfig {
 
     @Bean
     fun gatewayRoutes(
-        jwtFilters: JwtFilters
+        passportFilters: PassportFilters
     ): RouterFunction<ServerResponse> {
 
         val routes: RouterFunction<ServerResponse> =
             route()
-                .filter(jwtFilters.filterJwtSession())
+                .filter(passportFilters.insertPassport())
 
                 .add(route("checkpoints")
                     .route(path("/api/groups/{groupId}/sessions/**"), http())

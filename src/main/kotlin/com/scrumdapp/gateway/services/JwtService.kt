@@ -14,26 +14,6 @@ import org.springframework.security.oauth2.jwt.*
 import org.springframework.stereotype.Service
 import java.time.Instant
 
-@Configuration
-class JwtConfig {
-
-    @Bean
-    fun rsaKey(
-        @Value($$"${JWT_SECRET}") jwtSecret: String
-    ):RSAKey {
-        return RSAKeyGenerator(2048).keyID(jwtSecret).generate()
-    }
-
-    @Bean
-    fun createAsymmetricJwtEncoder(
-        rsaKey: RSAKey
-    ): JwtEncoder {
-        val jwkSet = JWKSet(rsaKey)
-        val jwkSource = ImmutableJWKSet<SecurityContext>(jwkSet)
-        return NimbusJwtEncoder(jwkSource)
-    }
-}
-
 @Service
 class JwtService(
     private val jwtEncoder: JwtEncoder,
