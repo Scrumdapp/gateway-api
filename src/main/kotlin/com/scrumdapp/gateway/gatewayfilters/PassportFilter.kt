@@ -21,7 +21,7 @@ data class JwtToken(
 
 @Component
 class PassportFilters(
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
 ) {
 
     fun insertPassport(): HandlerFilterFunction<ServerResponse, ServerResponse> {
