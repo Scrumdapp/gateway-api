@@ -1,6 +1,5 @@
 package com.scrumdapp.gateway.handlers
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.scrumdapp.gateway.handlers.exceptions.ApiResponse
 import com.scrumdapp.gateway.handlers.exceptions.ApplicationAuthenticationException
 import com.scrumdapp.gateway.handlers.exceptions.ApplicationException
@@ -22,6 +21,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
+import tools.jackson.databind.ObjectMapper
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone

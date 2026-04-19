@@ -1,13 +1,9 @@
 package com.scrumdapp.gateway.handlers.exceptions
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.scrumdapp.gateway.utils.ExceptionResponseMapper
-import com.scrumdapp.gateway.utils.ExceptionResponseWriter
-import com.scrumdapp.gateway.utils.ExceptionUtils
+import com.scrumdapp.gateway.services.ExceptionService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
-import org.springframework.http.MediaType
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.web.AuthenticationEntryPoint
@@ -19,8 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 
 @Component
 class CustomAuthenticationFailureHandler(
-    private val exceptionMapper: ExceptionResponseMapper,
-    private val exceptionWriter: ExceptionResponseWriter
+    private val exceptionService: ExceptionService
 ): AuthenticationFailureHandler {
 
     override fun onAuthenticationFailure(
@@ -28,14 +23,14 @@ class CustomAuthenticationFailureHandler(
         response: HttpServletResponse,
         exception: AuthenticationException
     ) {
-        val body = exceptionMapper.map(exception.cause)
-        exceptionWriter.write(response, body)
+        val body = exceptionService.mapException(exception.cause)
+        exceptionService.returnException(response, body)
     }
 }
 
 @Component
 class CustomAuthenticationEntrypoint(
-    private val exceptionWriter: ExceptionResponseWriter
+    private val exceptionService: ExceptionService
 ): AuthenticationEntryPoint {
     override fun commence(
         request: HttpServletRequest,
@@ -46,14 +41,13 @@ class CustomAuthenticationEntrypoint(
             code = HttpStatus.UNAUTHORIZED.value(),
             message = "Not authorized, please log in"
         )
-        exceptionWriter.write(response, body)
+        exceptionService.returnException(response, body)
     }
 }
 
 @Component
 class CustomAccessDeniedHandler(
-    private val exceptionMapper: ExceptionResponseMapper,
-    private val exceptionWriter: ExceptionResponseWriter
+    private val exceptionService: ExceptionService
 ): AccessDeniedHandler {
 
     override fun handle(
@@ -61,19 +55,18 @@ class CustomAccessDeniedHandler(
         response: HttpServletResponse,
         accessDeniedException: AccessDeniedException
     ) {
-        val body = exceptionMapper.map(accessDeniedException.cause)
-        exceptionWriter.write(response, body)
+        val body = exceptionService.mapException(accessDeniedException.cause)
+        exceptionService.returnException(response, body)
     }
 }
 
 @RestControllerAdvice
 class ControllerExceptionHandler(
-    private val exceptionMapper: ExceptionResponseMapper,
-    private val exceptionWriter: ExceptionResponseWriter
+    private val exceptionService: ExceptionService
 ) {
     @ExceptionHandler(ApplicationException::class)
     fun handleApplicationException(e: ApplicationException, res: HttpServletResponse) {
-        val body = exceptionMapper.map(e)
-        exceptionWriter.write(res, body)
+        val body = exceptionService.mapException(e)
+        exceptionService.returnException(res, body)
     }
 }

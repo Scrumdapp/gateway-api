@@ -1,6 +1,5 @@
 package com.scrumdapp.gateway.services
 
-import com.netflix.appinfo.ApplicationInfoManager
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
