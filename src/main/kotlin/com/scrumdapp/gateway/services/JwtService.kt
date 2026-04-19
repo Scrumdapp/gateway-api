@@ -16,13 +16,13 @@ import java.time.Instant
 @Service
 class JwtService(
     private val jwtEncoder: JwtEncoder,
-    private val applicationInfoManager: ApplicationInfoManager,
+
 ) {
     fun generateJwtToken(
         subject: String, claims: Map<String, Any>): String {
 
         val claimSet = JwtClaimsSet.builder()
-            .issuer(applicationInfoManager.info.homePageUrl)
+            .issuer("localhost:9999")
             .subject(subject)
             .expiresAt(Instant.now().plusSeconds(60*5))
             .claims { it.putAll(claims) }

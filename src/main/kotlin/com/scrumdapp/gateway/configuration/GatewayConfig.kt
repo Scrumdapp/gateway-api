@@ -3,6 +3,7 @@ package com.scrumdapp.gateway.configuration
 import com.scrumdapp.gateway.gatewayfilters.PassportFilters
 import com.scrumdapp.gateway.gatewayfilters.PostUpstreamFilter
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath
+import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri
 import org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http
@@ -35,24 +36,24 @@ class GatewayConfig {
 
                 .add(route("checkpoints")
                     .route(path("/api/groups/{groupId}/sessions/**"), http())
-                    .filter(lb("CHECKPOINT-SERVICE"))
+                    .before(uri("http://checkpoint-service"))
                     .build()
                 )
                 .add(route("groups")
                     .route(path("/api/groups/**"), http())
-                    .filter(lb("GROUPS-SERVICE"))
+                    .before(uri("http://group-service"))
                     .build()
                 )
                 .add(route("users")
                     .route(path("/users/**"), http())
-                    .filter(lb("USER-SERVICE"))
                     .filter(postUpstreamFilter.invalidatePassport())
+                    .before(uri("http://user-service"))
                     .build()
                 )
                 .add(route("invites")
                     .route(path("/invites/**"), http())
-                    .filter(lb("INVITE-SERVICE"))
                     .filter(postUpstreamFilter.invalidatePassport())
+                    .before(uri("http://invite-service"))
                     .build()
                 )
 
