@@ -39,7 +39,7 @@ class CustomAuthenticationEntrypoint(
     ) {
         val body = ApiResponse(
             code = HttpStatus.UNAUTHORIZED.value(),
-            message = "Not authorized, please log in"
+            message = authException.message ?: "Unauthorized",
         )
         exceptionService.returnException(response, body)
     }
