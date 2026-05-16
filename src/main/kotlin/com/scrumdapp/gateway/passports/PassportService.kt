@@ -48,20 +48,4 @@ class PassportService(
 
         return PassportToken(token, expiresAt)
     }
-
-    fun generateGatewayPassport(): PassportToken {
-
-        val expiresAt = Instant.now().plusSeconds(passportLifeTime)
-        val content = PassportContent(
-            userId = -1,
-            roles = listOf("GATEWAY")
-        )
-
-        val token = jwtService.generateJwtToken(
-            subject = "-1",
-            claims = content.toJwtClaim()
-        )
-
-        return PassportToken(token, expiresAt)
-    }
 }

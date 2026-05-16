@@ -2,6 +2,9 @@ package com.scrumdapp.gateway.services
 
 import com.scrumdapp.gateway.passports.PassportContent
 import com.scrumdapp.gateway.passports.PassportService
+import com.scrumdapp.gateway.passports.PassportToken
+import com.scrumdapp.gateway.security.jwt.JwtService
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -10,15 +13,17 @@ import org.springframework.web.client.RestClient.builder
 import org.springframework.web.client.toEntity
 import tools.jackson.module.kotlin.jacksonObjectMapper
 import tools.jackson.module.kotlin.readValue
+import java.time.Instant
 
 @Service
 class DownstreamRequestService(
-    private val passportService: PassportService
+    private val jwtService: JwtService,
+    @Value($$"${JWT_LIFETIME}") private val passportLifeTime: Long = 60*5
 ) {
 
     private val mapper = jacksonObjectMapper()
 
-    private var jwtToken = passportService.generateGatewayPassport()
+    private var jwtToken = genGatewayToken()
 
     fun getPassport(userId: Int): PassportContent {
         return performRequest("${userId}", "/users/$userId/passport")
@@ -26,7 +31,7 @@ class DownstreamRequestService(
 
     private inline fun <reified T> performRequest(baseUrl: String, uri: String): T{
 
-        if (jwtToken.isExpired()) jwtToken = passportService.generateGatewayPassport()
+        if (jwtToken.isExpired()) jwtToken = genGatewayToken()
 
         val reqBuilder = builder().baseUrl(baseUrl).build()
 
@@ -49,4 +54,21 @@ class DownstreamRequestService(
             throw Exception(e)
         }
     }
+
+    private fun genGatewayToken(): PassportToken {
+
+        val expiresAt = Instant.now().plusSeconds(passportLifeTime)
+        val content = PassportContent(
+            userId = -1,
+            roles = listOf("GATEWAY")
+        )
+
+        val token = jwtService.generateJwtToken(
+            subject = "-1",
+            claims = content.toJwtClaim()
+        )
+
+        return PassportToken(token, expiresAt)
+    }
+
 }

@@ -7,7 +7,7 @@ import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 
 
-class InvalidatePassportFilter(
+class PassportInvalidationFilter(
     private val passportRevokePaths: Map<String, List<HttpMethod>>
 ) {
 
