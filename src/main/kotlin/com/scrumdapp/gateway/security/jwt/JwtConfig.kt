@@ -1,39 +1,39 @@
-package com.scrumdapp.gateway.configuration
+package com.scrumdapp.gateway.security.jwt
 
 import com.nimbusds.jose.jwk.JWKSet
 import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.proc.SecurityContext
-import com.scrumdapp.gateway.utils.KeyUtils
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 import org.springframework.security.oauth2.jwt.JwtEncoder
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder
-import java.security.interfaces.RSAPrivateKey
 
 @Configuration
 class JwtConfig(
-    @Value($$"${jwt.private-key-path:classpath:keys/private.pem}") private val privateKeyPath: String,
-    @Value($$"${jwt.public-key-path:classpath:keys/public.pem}") private val publicKeyPath: String,
-    private val keyUtils: KeyUtils
+    @Value($$"${RSA_PRIVATE_KEY}") private val privateKey: String,
+    @Value($$"${RSA_PUBLIC_KEY}") private val publicKey: String,
+    private val jwtKeyUtils: JwtKeyUtils
 ) {
 
     @Profile("dev")
     @Bean
     fun devRsaKey(
         @Value($$"${JWT_SECRET}") jwtSecret: String
-    ):RSAKey {
+    ): RSAKey {
+        println("Using development generated RSA key")
         return RSAKeyGenerator(2048).keyID(jwtSecret).generate()
     }
 
     @Bean
-    fun rsaKey():RSAKey {
-        val privateKey = keyUtils.loadPrivateKey(privateKeyPath)
-        val publicKey = keyUtils.loadPublicKey(publicKeyPath)
+    fun rsaKey(): RSAKey {
+        println("Using pre-generated .pem RSA key")
 
+        val privateKey = jwtKeyUtils.loadPrivateKey(privateKey)
+        val publicKey = jwtKeyUtils.loadPublicKey(publicKey)
         return RSAKey.Builder(publicKey)
             .privateKey(privateKey)
             .keyID("Gateway-key")

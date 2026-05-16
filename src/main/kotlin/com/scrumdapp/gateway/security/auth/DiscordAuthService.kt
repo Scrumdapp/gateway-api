@@ -1,6 +1,7 @@
-package com.scrumdapp.gateway.services
+package com.scrumdapp.gateway.security.auth
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -31,35 +32,29 @@ data class DiscordGuildMember(
     val avatar: String?,
 )
 
-interface DiscordService {
-    fun getUser(token: String): Result<DiscordUser>
-    fun getGuilds(token: String): Result<List<DiscordGuild>>
-    fun getGuildMember(token: String, guildId: String): Result<DiscordGuildMember>
-    fun isInServer(accessToken: String, authGuild: String): Boolean
-}
 
 @Component
-class DiscordServiceImpl(
+class DiscordService(
     builder: RestClient.Builder,
-) : DiscordService {
+) {
 
     private val restClient = builder
         .baseUrl("https://discord.com/api/v10")
         .build()
 
-    override fun getUser(token: String): Result<DiscordUser> {
+    fun getUser(token: String): Result<DiscordUser> {
         return discordRequest("/users/@me", token)
     }
 
-    override fun getGuilds(token: String): Result<List<DiscordGuild>> {
+    fun getGuilds(token: String): Result<List<DiscordGuild>> {
         return discordRequest("/users/@me/guilds", token)
     }
 
-    override fun getGuildMember(token: String, guildId: String): Result<DiscordGuildMember> {
+    fun getGuildMember(token: String, guildId: String): Result<DiscordGuildMember> {
         return discordRequest("/users/@me/guilds/${guildId}/member", token)
     }
 
-    override fun isInServer(accessToken: String, authGuild: String): Boolean {
+    fun isInServer(accessToken: String, authGuild: String): Boolean {
         val guilds = getGuilds(accessToken)
         if (guilds.isFailure) throw RuntimeException("There was an error while fetching guilds.")
 
@@ -75,19 +70,19 @@ class DiscordServiceImpl(
         return try {
             val response = restClient.get()
                 .uri(endpoint)
-                .header("authorization", String.format("Bearer %s", token))
+                .header(HttpHeaders.AUTHORIZATION, String.format("Bearer %s", token))
                 .accept(MediaType.APPLICATION_JSON)
                 .retrieve()
                 .toEntity<String>()
 
             if (response.statusCode == HttpStatus.OK) {
-                val body = response.body?: return Result.failure(RuntimeException("meh"))
+                val body = response.body?: return Result.failure(IllegalStateException("Body is missing"))
                 val mapper = jacksonObjectMapper()
                 val parsed = mapper.readValue<T>(body)
 
                 Result.success(parsed)
             } else {
-                Result.failure(IllegalStateException("response body is null"))
+                Result.failure(Exception("Request failed ${response.statusCode}, body: ${response.body}"))
             }
         } catch (e: Exception) {
             Result.failure(e)

@@ -1,13 +1,12 @@
-package com.scrumdapp.gateway.handlers
+package com.scrumdapp.gateway.security.auth
 
-import com.scrumdapp.gateway.handlers.exceptions.ApiResponse
-import com.scrumdapp.gateway.handlers.exceptions.ApplicationAuthenticationException
-import com.scrumdapp.gateway.handlers.exceptions.ApplicationException
-import com.scrumdapp.gateway.handlers.exceptions.NoAccessException
-import com.scrumdapp.gateway.handlers.exceptions.NotAuthorizedException
-import com.scrumdapp.gateway.handlers.exceptions.ServerFaultException
-import com.scrumdapp.gateway.services.DiscordService
-import com.scrumdapp.gateway.services.JwtService
+import com.scrumdapp.gateway.exceptions.ApiResponse
+import com.scrumdapp.gateway.exceptions.ApplicationAuthenticationException
+import com.scrumdapp.gateway.exceptions.ApplicationException
+import com.scrumdapp.gateway.exceptions.NoAccessException
+import com.scrumdapp.gateway.exceptions.NotAuthorizedException
+import com.scrumdapp.gateway.exceptions.ServerFaultException
+import com.scrumdapp.gateway.security.jwt.JwtService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -27,13 +26,13 @@ import java.util.Date
 import java.util.TimeZone
 
 @Component
-class OAuthCallbackHandler(
+class DiscordCallbackHandler(
     private val failureHandler: AuthenticationFailureHandler,
     private val authorizedClientService: OAuth2AuthorizedClientService,
     private val jwtService: JwtService,
     private val discordService: DiscordService,
     @Value($$"${DISCORD_ALLOWED_GUILD}") private val allowedGuild: String
-): AuthenticationSuccessHandler  {
+): AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
         request: HttpServletRequest,
@@ -57,6 +56,7 @@ class OAuthCallbackHandler(
 
                 //TODO(Add expiry time here)
                 val tokenExpiry = s.format(Date()) + client.refreshToken?.expiresAt
+                println(tokenExpiry)
 
                 val discordUser = discordService.getUser(accessToken).getOrElse {
                     throw ServerFaultException(message = "Could not fetch user from Discord")
@@ -73,14 +73,11 @@ class OAuthCallbackHandler(
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
                 ObjectMapper().writeValue(response.outputStream, ApiResponse(code = 200, "login successful"))
             } else {
-
-                //TODO(error not thrown properly here
                 throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }
         } catch (exception: ApplicationException) {
 
             if (exception is NoAccessException) {
-                println("Reached this")
                 SecurityContextHolder.clearContext()
                 request.session.invalidate()
             }

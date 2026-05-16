@@ -1,10 +1,9 @@
 package com.scrumdapp.gateway.configuration
 
-import com.scrumdapp.gateway.gatewayfilters.PassportFilters
-import com.scrumdapp.gateway.gatewayfilters.PostUpstreamFilter
+import com.scrumdapp.gateway.passports.PassportFilters
+import com.scrumdapp.gateway.passports.InvalidatePassportFilter
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri
-import org.springframework.cloud.gateway.server.mvc.filter.LoadBalancerFilterFunctions.lb
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions.route
 import org.springframework.cloud.gateway.server.mvc.handler.HandlerFunctions.http
 import org.springframework.cloud.gateway.server.mvc.predicate.GatewayRequestPredicates.path
@@ -23,7 +22,7 @@ class GatewayConfig {
         passportFilters: PassportFilters
     ): RouterFunction<ServerResponse> {
 
-        val postUpstreamFilter = PostUpstreamFilter(
+        val invalidatePassportFilter = InvalidatePassportFilter(
             mapOf(
                 "/api/invites/{id}/accept" to listOf(HttpMethod.POST),
                 "/api/users/{id}" to listOf(HttpMethod.POST, HttpMethod.PATCH)
@@ -34,6 +33,11 @@ class GatewayConfig {
             route()
                 .filter(passportFilters.insertPassport())
 
+                .add(route("test")
+                    .route(path("api/test"), http())
+                    .before(uri("http://localhost:8080"))
+                    .build()
+                )
                 .add(route("checkpoints")
                     .route(path("/api/groups/{groupId}/sessions/**"), http())
                     .before(uri("http://checkpoint-service"))
@@ -46,14 +50,14 @@ class GatewayConfig {
                 )
                 .add(route("users")
                     .route(path("/users/**"), http())
-                    .filter(postUpstreamFilter.invalidatePassport())
+                    .filter(invalidatePassportFilter.invalidatePassport())
                     .before(uri("http://user-service"))
                     .build()
                 )
                 .add(route("invites")
                     .route(path("/invites/**"), http())
-                    .filter(postUpstreamFilter.invalidatePassport())
-                    .before(uri("http://invite-service"))
+                    .filter(invalidatePassportFilter.invalidatePassport())
+                    .before(uri("http://localhost:3000"))
                     .build()
                 )
 

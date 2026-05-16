@@ -1,7 +1,7 @@
 package com.scrumdapp.gateway.services
 
-import com.scrumdapp.gateway.handlers.exceptions.ApiResponse
-import com.scrumdapp.gateway.handlers.exceptions.ApplicationException
+import com.scrumdapp.gateway.exceptions.ApiResponse
+import com.scrumdapp.gateway.exceptions.ApplicationException
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -1,4 +1,4 @@
-package com.scrumdapp.gateway.handlers.exceptions
+package com.scrumdapp.gateway.exceptions
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.http.HttpStatus

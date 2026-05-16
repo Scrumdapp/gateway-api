@@ -1,4 +1,4 @@
-package com.scrumdapp.gateway.gatewayfilters
+package com.scrumdapp.gateway.passports
 
 import org.springframework.http.HttpMethod
 import org.springframework.web.servlet.function.HandlerFilterFunction
@@ -7,7 +7,7 @@ import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 
 
-class PostUpstreamFilter(
+class InvalidatePassportFilter(
     private val passportRevokePaths: Map<String, List<HttpMethod>>
 ) {
 

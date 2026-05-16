@@ -1,15 +1,12 @@
-package com.scrumdapp.gateway.services
+package com.scrumdapp.gateway.security.jwt
 
-import com.nimbusds.jose.jwk.JWKSet
-import com.nimbusds.jose.jwk.RSAKey
-import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
-import com.nimbusds.jose.jwk.source.ImmutableJWKSet
-import com.nimbusds.jose.proc.SecurityContext
+import com.nimbusds.jwt.JWTParser
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.security.oauth2.jose.jws.SignatureAlgorithm
-import org.springframework.security.oauth2.jwt.*
+import org.springframework.security.oauth2.jwt.JwsHeader
+import org.springframework.security.oauth2.jwt.JwtClaimsSet
+import org.springframework.security.oauth2.jwt.JwtEncoder
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters
 import org.springframework.stereotype.Service
 import java.time.Instant
 
@@ -17,9 +14,11 @@ import java.time.Instant
 class JwtService(
     private val jwtEncoder: JwtEncoder,
 
+    @Value($$"${spring.application.name}") private val appName: String,
 ) {
     fun generateJwtToken(
-        subject: String, claims: Map<String, Any>): String {
+        subject: String,
+        claims: Map<String, Any>): String {
 
         val claimSet = JwtClaimsSet.builder()
             .issuer("localhost:9999")
@@ -33,5 +32,11 @@ class JwtService(
         return jwtEncoder.encode(
             JwtEncoderParameters.from(headers, claimSet)
         ).tokenValue
+    }
+
+    fun extractClaims(token: String): Map<String, Any> {
+
+        val claims = JWTParser.parse(token)
+        return claims.jwtClaimsSet.claims
     }
 }

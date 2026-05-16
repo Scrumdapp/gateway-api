@@ -1,4 +1,4 @@
-package com.scrumdapp.gateway.handlers.exceptions
+package com.scrumdapp.gateway.exceptions
 
 import com.scrumdapp.gateway.services.ExceptionService
 import jakarta.servlet.http.HttpServletRequest
@@ -65,7 +65,7 @@ class ControllerExceptionHandler(
     private val exceptionService: ExceptionService
 ) {
     @ExceptionHandler(ApplicationException::class)
-    fun handleApplicationException(e: ApplicationException, res: HttpServletResponse) {
+    fun andleApplicationException(e: ApplicationException, res: HttpServletResponse) {
         val body = exceptionService.mapException(e)
         exceptionService.returnException(res, body)
     }

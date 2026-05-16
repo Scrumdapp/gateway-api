@@ -1,4 +1,4 @@
-package com.scrumdapp.gateway.configuration
+package com.scrumdapp.gateway.security.auth
 
 import org.springframework.boot.web.servlet.ServletContextInitializer
 import org.springframework.context.annotation.Bean
@@ -11,7 +11,7 @@ class CookieConfig {
     fun servletCookieInitializer(): ServletContextInitializer {
         return ServletContextInitializer { ctx ->
             val cookieConfig = ctx.sessionCookieConfig
-            cookieConfig.name = "ALLINDADDY"
+            cookieConfig.name = "SCRUMCELL"
             cookieConfig.isHttpOnly = true
             cookieConfig.isSecure = true
             cookieConfig.path = "/"

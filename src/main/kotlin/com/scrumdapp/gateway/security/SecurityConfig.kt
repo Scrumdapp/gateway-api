@@ -1,7 +1,7 @@
-package com.scrumdapp.gateway.configuration
+package com.scrumdapp.gateway.security
 
-import com.scrumdapp.gateway.handlers.exceptions.CustomAccessDeniedHandler
-import com.scrumdapp.gateway.handlers.exceptions.CustomAuthenticationEntrypoint
+import com.scrumdapp.gateway.exceptions.CustomAccessDeniedHandler
+import com.scrumdapp.gateway.exceptions.CustomAuthenticationEntrypoint
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity

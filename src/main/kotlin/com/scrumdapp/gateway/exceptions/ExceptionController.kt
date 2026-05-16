@@ -1,16 +1,10 @@
-package com.scrumdapp.gateway.controllers
+package com.scrumdapp.gateway.exceptions
 
-import com.scrumdapp.gateway.handlers.exceptions.NoAccessException
-import com.scrumdapp.gateway.handlers.exceptions.NotAuthorizedException
-import com.scrumdapp.gateway.handlers.exceptions.NotFoundException
-import com.scrumdapp.gateway.handlers.exceptions.ServerFaultException
-import com.scrumdapp.gateway.handlers.exceptions.ServiceUnavailableException
 import jakarta.servlet.RequestDispatcher
 import jakarta.servlet.http.HttpServletRequest
 import org.springframework.boot.webmvc.error.ErrorController
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
-
 
 @RestController
 class ExceptionController: ErrorController {
