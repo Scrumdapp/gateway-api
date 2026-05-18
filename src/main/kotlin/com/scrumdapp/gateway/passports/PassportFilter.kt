@@ -19,7 +19,7 @@ class PassportFilters(
             val session = req.session() ?: return@HandlerFilterFunction next.handle(req)
 
             var cachedToken = session.getAttribute("JWT_AC_TOKEN") as? PassportToken
-            val userId = session.getAttribute("userId") as? Int ?: throw NotAuthorizedException(message = "Unauthorized, please log in again")
+            val userId = session.getAttribute("userId") as? Long ?: throw NotAuthorizedException(message = "Unauthorized, please log in again")
 
             if (cachedToken == null || cachedToken.isExpired()) {
                 cachedToken = passportService.generatePassport(userId)

@@ -32,7 +32,7 @@ class PassportService(
 
     @Value($$"${JWT_LIFETIME}") private val passportLifeTime: Long = 60*5
 ) {
-    fun generatePassport(userId: Int): PassportToken {
+    fun generatePassport(userId: Long): PassportToken {
 
         val expiresAt = Instant.now().plusSeconds(passportLifeTime)
 

@@ -49,7 +49,9 @@ class DiscordCallbackHandler(
                 if (client.refreshToken == null) throw NotAuthorizedException(message = "Unauthorized, no refresh token provided")
 
                 val userId = discordUserService.handleLogin(client.accessToken.tokenValue)
-                request.session.setAttribute("userId", userId)
+
+                val session = request.getSession(true)
+                session.setAttribute("userId", userId)
 
                 response.status = HttpStatus.OK.value()
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
