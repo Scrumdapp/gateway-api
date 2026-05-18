@@ -1,41 +1,31 @@
-package com.scrumdapp.gateway.services
+package com.scrumdapp.gateway.exceptions
 
-import com.scrumdapp.gateway.exceptions.ApiResponse
-import com.scrumdapp.gateway.exceptions.ApplicationException
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpServerErrorException
 import tools.jackson.databind.ObjectMapper
 
-interface ExceptionService {
-    fun logException(throwable: Throwable)
-    fun returnException(res: HttpServletResponse, body: ApiResponse)
-    fun mapException(throwable: Throwable?): ApiResponse
-}
 
-@Component
-class ExceptionServiceImpl(
+@Service
+class ExceptionService(
     private val objectMapper: ObjectMapper,
     private val logger: Logger = LoggerFactory.getLogger(ApplicationException::class.java)
-): ExceptionService {
+) {
 
-
-
-    override fun logException(throwable: Throwable)
+    fun logException(throwable: Throwable)
     {
         if (throwable is ApplicationException && throwable.enableLogging) {
             logger.error("${throwable.code} - ${throwable.message}", throwable)
         } else {
             logger.error(throwable.message, throwable)
         }
-
     }
 
-    override fun returnException(
+    fun returnException(
         res: HttpServletResponse,
         body: ApiResponse
     ) {
@@ -45,7 +35,7 @@ class ExceptionServiceImpl(
         objectMapper.writeValue(res.outputStream, body)
     }
 
-    override fun mapException(throwable: Throwable?): ApiResponse {
+    fun mapException(throwable: Throwable?): ApiResponse {
         if (throwable == null) {
             return ApiResponse(
                 HttpStatus.UNAUTHORIZED.value(),

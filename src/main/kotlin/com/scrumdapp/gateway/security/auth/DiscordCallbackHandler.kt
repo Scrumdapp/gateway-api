@@ -1,12 +1,13 @@
 package com.scrumdapp.gateway.security.auth
 
+import com.scrumdapp.gateway.discordUser.DiscordService
+import com.scrumdapp.gateway.discordUser.DiscordUserService
 import com.scrumdapp.gateway.exceptions.ApiResponse
 import com.scrumdapp.gateway.exceptions.ApplicationAuthenticationException
 import com.scrumdapp.gateway.exceptions.ApplicationException
 import com.scrumdapp.gateway.exceptions.NoAccessException
 import com.scrumdapp.gateway.exceptions.NotAuthorizedException
 import com.scrumdapp.gateway.exceptions.ServerFaultException
-import com.scrumdapp.gateway.security.jwt.JwtService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.beans.factory.annotation.Value
@@ -29,9 +30,7 @@ import java.util.TimeZone
 class DiscordCallbackHandler(
     private val failureHandler: AuthenticationFailureHandler,
     private val authorizedClientService: OAuth2AuthorizedClientService,
-    private val jwtService: JwtService,
-    private val discordService: DiscordService,
-    @Value($$"${DISCORD_ALLOWED_GUILD}") private val allowedGuild: String
+    private val discordUserService: DiscordUserService
 ): AuthenticationSuccessHandler {
 
     override fun onAuthenticationSuccess(
@@ -47,27 +46,10 @@ class DiscordCallbackHandler(
                     token.name
                 )
 
-                if (client.refreshToken == null) throw NotAuthorizedException()
+                if (client.refreshToken == null) throw NotAuthorizedException(message = "Unauthorized, no refresh token provided")
 
-                val accessToken = client.accessToken.tokenValue
-
-                val s = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
-                s.timeZone = TimeZone.getTimeZone("GMT")
-
-                //TODO(Add expiry time here)
-                val tokenExpiry = s.format(Date()) + client.refreshToken?.expiresAt
-                println(tokenExpiry)
-
-                val discordUser = discordService.getUser(accessToken).getOrElse {
-                    throw ServerFaultException(message = "Could not fetch user from Discord")
-                }
-
-                val result = discordService.isInServer(accessToken, allowedGuild)
-                if (!result) {
-                    throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
-                }
-
-                //TODO( Update shit within user db )
+                val userId = discordUserService.handleLogin(client.accessToken.tokenValue)
+                request.session.setAttribute("userId", userId)
 
                 response.status = HttpStatus.OK.value()
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
@@ -77,6 +59,7 @@ class DiscordCallbackHandler(
             }
         } catch (exception: ApplicationException) {
 
+            println(exception.message)
             if (exception is NoAccessException) {
                 SecurityContextHolder.clearContext()
                 request.session.invalidate()

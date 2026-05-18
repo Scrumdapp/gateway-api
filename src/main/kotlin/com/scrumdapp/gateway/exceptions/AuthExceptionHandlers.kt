@@ -1,6 +1,5 @@
 package com.scrumdapp.gateway.exceptions
 
-import com.scrumdapp.gateway.services.ExceptionService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpStatus
