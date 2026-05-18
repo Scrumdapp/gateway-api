@@ -47,7 +47,7 @@ class DownstreamRequestService(
         uri: String,
         classZ: Class<T>,
         body: Any? = null,
-        ): T{
+        ): T {
 
         if (jwtToken.isExpired()) jwtToken = genGatewayToken()
 

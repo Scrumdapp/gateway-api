@@ -32,11 +32,8 @@ class PassportService(
 
     @Value($$"${JWT_LIFETIME}") private val passportLifeTime: Long = 60*5
 ) {
-
-
     fun generatePassport(userId: Int): PassportToken {
 
-        // Change this to a value
         val expiresAt = Instant.now().plusSeconds(passportLifeTime)
 
         val claims = requestService.getPassport(userId)
@@ -45,7 +42,6 @@ class PassportService(
             subject = userId.toString(),
             claims = claims.toJwtClaim()
         )
-
         return PassportToken(token, expiresAt)
     }
 }

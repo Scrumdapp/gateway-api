@@ -1,5 +1,6 @@
 package com.scrumdapp.gateway.passports
 
+import com.scrumdapp.gateway.exceptions.NotAuthorizedException
 import org.springframework.http.HttpHeaders
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.function.HandlerFilterFunction
@@ -18,9 +19,10 @@ class PassportFilters(
             val session = req.session() ?: return@HandlerFilterFunction next.handle(req)
 
             var cachedToken = session.getAttribute("JWT_AC_TOKEN") as? PassportToken
+            val userId = session.getAttribute("userId") as? Int ?: throw NotAuthorizedException(message = "Unauthorized, please log in again")
 
             if (cachedToken == null || cachedToken.isExpired()) {
-                cachedToken = passportService.generatePassport(23)
+                cachedToken = passportService.generatePassport(userId)
                 session.setAttribute("JWT_AC_TOKEN", cachedToken)
             }
 
