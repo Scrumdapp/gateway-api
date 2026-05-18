@@ -1,5 +1,6 @@
 package com.scrumdapp.gateway.configuration
 
+import com.scrumdapp.gateway.ServiceProperties
 import com.scrumdapp.gateway.passports.PassportFilters
 import com.scrumdapp.gateway.passports.PassportInvalidationFilter
 import org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.rewritePath
@@ -19,7 +20,8 @@ class GatewayConfig {
 
     @Bean
     fun gatewayRoutes(
-        passportFilters: PassportFilters
+        passportFilters: PassportFilters,
+        services: ServiceProperties
     ): RouterFunction<ServerResponse> {
 
         val passportInvalidationFilter = PassportInvalidationFilter(
@@ -40,24 +42,24 @@ class GatewayConfig {
                 )
                 .add(route("checkpoints")
                     .route(path("/api/groups/{groupId}/sessions/**"), http())
-                    .before(uri("http://checkpoint-service"))
+                    .before(uri(services.getUrl("checkpoints")))
                     .build()
                 )
                 .add(route("groups")
                     .route(path("/api/groups/**"), http())
-                    .before(uri("http://group-service"))
+                    .before(uri(services.getUrl("groups")))
                     .build()
                 )
                 .add(route("users")
                     .route(path("/users/**"), http())
                     .filter(passportInvalidationFilter.invalidatePassport())
-                    .before(uri("http://user-service"))
+                    .before(uri(services.getUrl("users")))
                     .build()
                 )
                 .add(route("invites")
                     .route(path("/invites/**"), http())
                     .filter(passportInvalidationFilter.invalidatePassport())
-                    .before(uri("http://localhost:3000"))
+                    .before(uri(services.getUrl("invites")))
                     .build()
                 )
 

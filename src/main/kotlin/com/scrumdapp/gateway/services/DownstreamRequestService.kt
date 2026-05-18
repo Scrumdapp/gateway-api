@@ -34,11 +34,11 @@ class DownstreamRequestService(
     private var jwtToken = genGatewayToken()
 
     fun getPassport(userId: Int): PassportContent {
-        return performRequest(HttpMethod.GET, serviceProperties.getUrl("group"), "/users/$userId/passport", PassportContent::class.java)
+        return performRequest(HttpMethod.GET, serviceProperties.getUrl("groups"), "/users/$userId/passport", PassportContent::class.java)
     }
 
     fun upsertUser(user: UpsertUser): ScrumdappUser {
-        return performRequest(HttpMethod.PATCH, serviceProperties.getUrl("user"), "/users/gateway", ScrumdappUser::class.java, user)
+        return performRequest(HttpMethod.PATCH, serviceProperties.getUrl("users"), "/users/gateway", ScrumdappUser::class.java, user)
     }
 
     private fun <T> performRequest(
