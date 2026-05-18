@@ -42,6 +42,7 @@ class PassportService(
             subject = userId.toString(),
             claims = claims.toJwtClaim()
         )
+
         return PassportToken(token, expiresAt)
     }
 }

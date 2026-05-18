@@ -24,6 +24,7 @@ class GatewayConfig {
         services: ServiceProperties
     ): RouterFunction<ServerResponse> {
 
+        // Endpoints registered here will cause any existing passport to be invalidated
         val passportInvalidationFilter = PassportInvalidationFilter(
             mapOf(
                 "/api/invites/{id}/accept" to listOf(HttpMethod.POST),
@@ -35,13 +36,9 @@ class GatewayConfig {
             route()
                 .filter(passportFilters.insertPassport())
 
-                .add(route("test")
-                    .route(path("api/test"), http())
-                    .before(uri("http://localhost:8080"))
-                    .build()
-                )
                 .add(route("checkpoints")
                     .route(path("/api/groups/{groupId}/sessions/**"), http())
+                    .route(path("/api/groups/{groupId}/checkpoints/**"), http())
                     .before(uri(services.getUrl("checkpoints")))
                     .build()
                 )
@@ -51,19 +48,19 @@ class GatewayConfig {
                     .build()
                 )
                 .add(route("users")
-                    .route(path("/users/**"), http())
+                    .route(path("api/users/**"), http())
                     .filter(passportInvalidationFilter.invalidatePassport())
                     .before(uri(services.getUrl("users")))
                     .build()
                 )
                 .add(route("invites")
-                    .route(path("/invites/**"), http())
+                    .route(path("api/invites/**"), http())
                     .filter(passportInvalidationFilter.invalidatePassport())
                     .before(uri(services.getUrl("invites")))
                     .build()
                 )
 
-                .before(rewritePath("/api/(?<segment>.*)", $$"/${segment}"))
+            .before(rewritePath("/api/(?<segment>.*)", $$"/${segment}"))
             .build()
 
        return routes
