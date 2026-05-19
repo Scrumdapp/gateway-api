@@ -18,7 +18,8 @@ data class UpsertUser(
 class DiscordUserService(
     private val discordService: DiscordService,
     private val requestService: DownstreamRequestService,
-    @Value($$"${DISCORD_ALLOWED_GUILD}") private val allowedGuild: String
+    @Value($$"${DISCORD_ALLOWED_GUILD}") private val allowedGuild: String,
+    @Value($$"${DISCORD_TEACHER_ROLE}") private val teacherRole: Long
 ) {
 
     fun handleLogin(accessToken: String): Long {
@@ -54,7 +55,7 @@ class DiscordUserService(
     private fun getRole(discordGuildMember: DiscordGuildMember): String {
         return if (discordGuildMember.roles.isEmpty()) {
             "student"
-        } else if (discordGuildMember.roles.find { it == 730402010351796314} != null) {
+        } else if (discordGuildMember.roles.find { it == teacherRole} != null) {
             "coach"
         } else {
             "student"
