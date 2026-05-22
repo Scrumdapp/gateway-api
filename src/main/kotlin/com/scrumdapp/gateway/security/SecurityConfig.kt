@@ -31,6 +31,9 @@ class SecurityConfig(
                 .successHandler(authenticationSuccessHandler)
                 .failureHandler(authenticationFailureHandler)
             }
+            .logout {
+                it.logoutUrl("/oauth2/logout")
+            }
             .exceptionHandling { h ->
                 h.authenticationEntryPoint(customAuthenticationEntryPoint)
                 h.accessDeniedHandler(customAccessDeniedHandler)

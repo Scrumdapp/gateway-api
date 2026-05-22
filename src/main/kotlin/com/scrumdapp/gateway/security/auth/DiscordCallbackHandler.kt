@@ -56,6 +56,7 @@ class DiscordCallbackHandler(
                 response.status = HttpStatus.OK.value()
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
                 ObjectMapper().writeValue(response.outputStream, ApiResponse(code = 200, "login successful"))
+//                response.sendRedirect("http://localhost:5173/groups")
             } else {
                 throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }

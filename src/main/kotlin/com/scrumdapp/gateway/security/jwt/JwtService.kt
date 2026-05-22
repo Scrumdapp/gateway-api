@@ -16,6 +16,7 @@ import java.time.Instant
 class JwtService(
     private val jwtEncoder: JwtEncoder,
     private val services: ServiceProperties,
+    @Value($$"${JWT_LIFETIME}") private val passportLifeTime: Long = 60*5
 ) {
     fun generateJwtToken(
         subject: String,
@@ -24,7 +25,7 @@ class JwtService(
         val claimSet = JwtClaimsSet.builder()
             .issuer(services.getUrl("gateway"))
             .subject(subject)
-            .expiresAt(Instant.now().plusSeconds(60*5))
+            .expiresAt(Instant.now().plusSeconds(passportLifeTime))
             .claims { it.putAll(claims) }
             .build()
 
