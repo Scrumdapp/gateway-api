@@ -54,7 +54,7 @@ class DiscordCallbackHandler(
                 val session = request.getSession(true)
                 session.setAttribute("userId", userId)
 
-                response.sendRedirect("http://localhost:5173/")
+                response.sendRedirect("/")
             } else {
                 throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }
