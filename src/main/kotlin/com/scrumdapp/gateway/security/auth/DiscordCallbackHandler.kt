@@ -53,20 +53,13 @@ class DiscordCallbackHandler(
                 val session = request.getSession(true)
                 session.setAttribute("userId", userId)
 
-                response.status = HttpStatus.OK.value()
-                response.contentType = MediaType.APPLICATION_JSON_VALUE
-                ObjectMapper().writeValue(response.outputStream, ApiResponse(code = 200, "login successful"))
-//                response.sendRedirect("http://localhost:5173/groups")
+                response.sendRedirect("/")
             } else {
                 throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }
         } catch (exception: ApplicationException) {
-
-            println(exception.message)
-            if (exception is NoAccessException) {
-                SecurityContextHolder.clearContext()
-                request.session.invalidate()
-            }
+            SecurityContextHolder.clearContext()
+            request.session.invalidate()
 
             failureHandler.onAuthenticationFailure(
                 request,

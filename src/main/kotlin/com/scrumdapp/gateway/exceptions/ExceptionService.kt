@@ -7,6 +7,8 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Service
 import org.springframework.web.client.HttpServerErrorException
+import org.springframework.web.client.ResourceAccessException
+import org.springframework.web.client.RestClientResponseException
 import tools.jackson.databind.ObjectMapper
 
 
@@ -16,12 +18,34 @@ class ExceptionService(
     private val logger: Logger = LoggerFactory.getLogger(ApplicationException::class.java)
 ) {
 
-    fun logException(throwable: Throwable)
+    fun logException(ex: Throwable)
     {
-        if (throwable is ApplicationException && throwable.enableLogging) {
-            logger.error("${throwable.code} - ${throwable.message}", throwable)
-        } else {
-            logger.error(throwable.message, throwable)
+        when (ex) {
+            is ApplicationException ->
+                if (ex.enableLogging) {
+                    logger.warn(
+                        "${ex.code}: ${ex.message}",
+                        ex
+                    )
+                }
+
+            is RestClientResponseException ->
+                logger.error(
+                    "Downstream service returned ${ex.statusCode}",
+                    ex
+                )
+
+            is ResourceAccessException ->
+                logger.error(
+                    "Downstream service unavailable",
+                    ex
+                )
+
+            else ->
+                logger.error(
+                    "Unhandled exception",
+                    ex
+                )
         }
     }
 
