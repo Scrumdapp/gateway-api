@@ -18,15 +18,6 @@ class AuthController(
         return RedirectView("oauth2/authorization/discord")
     }
 
-    @GetMapping("/logoutsuccessful")
-    fun logoutRedirect(): ApiResponse {
-        val body = ApiResponse(
-            code = HttpStatus.OK.value(),
-            message = "Logout successful"
-        )
-        return body
-    }
-
     @GetMapping("/.well-known/jwks.json")
     fun keys(): Map<String, Any> {
         val jwk = JWKSet(rsaKey).toPublicJWKSet().toJSONObject()

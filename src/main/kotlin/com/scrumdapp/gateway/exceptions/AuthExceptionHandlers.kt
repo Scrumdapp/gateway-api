@@ -6,7 +6,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.core.AuthenticationException
-import org.springframework.security.oauth2.core.OAuth2AuthorizationException
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
@@ -24,8 +23,8 @@ class CustomAuthenticationFailureHandler(
         response: HttpServletResponse,
         exception: AuthenticationException
     ) {
-        val body = exceptionService.mapException(exception.cause)
-        exceptionService.returnException(response, body)
+        exceptionService.logException(exception)
+        response.sendRedirect("/")
     }
 }
 
@@ -54,10 +53,10 @@ class CustomAccessDeniedHandler(
     override fun handle(
         request: HttpServletRequest,
         response: HttpServletResponse,
-        accessDeniedException: AccessDeniedException
+        exception: AccessDeniedException
     ) {
-        val body = exceptionService.mapException(accessDeniedException.cause)
-        exceptionService.returnException(response, body)
+        exceptionService.logException(exception)
+        response.sendRedirect("/")
     }
 }
 
@@ -66,9 +65,14 @@ class ControllerExceptionHandler(
     private val exceptionService: ExceptionService
 ) {
 
-    @ExceptionHandler(ApplicationException::class)
-    fun andleApplicationException(e: ApplicationException, res: HttpServletResponse) {
-        val body = exceptionService.mapException(e)
-        exceptionService.returnException(res, body)
+    @ExceptionHandler(Throwable::class)
+    fun handle(ex: Throwable): ResponseEntity<ApiResponse> {
+        exceptionService.logException(ex)
+
+        val body = exceptionService.mapException(ex)
+
+        return ResponseEntity
+            .status(body.code)
+            .body(body)
     }
 }

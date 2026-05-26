@@ -22,23 +22,29 @@ class SecurityConfig(
         http
             .csrf { it.disable() }
             .authorizeHttpRequests {
-                it.requestMatchers("/login/**", "/logoutsuccessful", "/oauth2/**", "/.well-known/jwks.json").permitAll()
+                it.requestMatchers("/api/oauth2/**", "/.well-known/jwks.json").permitAll()
                 it.requestMatchers("/error").permitAll()
                 it.anyRequest().authenticated()
             }
-            .oauth2Login { oauth2 -> oauth2
-                .loginPage("/oauth2/authorization/discord")
-                .successHandler(authenticationSuccessHandler)
-                .failureHandler(authenticationFailureHandler)
+            .oauth2Login { oauth2 ->
+                oauth2
+                    .authorizationEndpoint { endpoint ->
+                        endpoint.baseUri("/api/oauth2/authorization")
+                    }
+                    .redirectionEndpoint { endpoint ->
+                        endpoint.baseUri("/api/oauth2/code/*")
+                    }
+                    .successHandler(authenticationSuccessHandler)
+                    .failureHandler(authenticationFailureHandler)
             }
             .logout {
-                it.logoutUrl("/oauth2/logout")
+                it.logoutUrl("/api/oauth2/logout")
             }
             .exceptionHandling { h ->
                 h.authenticationEntryPoint(customAuthenticationEntryPoint)
                 h.accessDeniedHandler(customAccessDeniedHandler)
             }
-            .logout {logout -> logout.logoutSuccessUrl("/logoutsuccessful")}
+            .logout {logout -> logout.logoutSuccessUrl("/")}
 
         return http.build()
     }

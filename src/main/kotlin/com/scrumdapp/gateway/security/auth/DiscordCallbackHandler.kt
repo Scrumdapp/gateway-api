@@ -21,6 +21,7 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
+import org.springframework.web.servlet.resource.NoResourceFoundException
 import tools.jackson.databind.ObjectMapper
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -53,20 +54,13 @@ class DiscordCallbackHandler(
                 val session = request.getSession(true)
                 session.setAttribute("userId", userId)
 
-                response.status = HttpStatus.OK.value()
-                response.contentType = MediaType.APPLICATION_JSON_VALUE
-                ObjectMapper().writeValue(response.outputStream, ApiResponse(code = 200, "login successful"))
-//                response.sendRedirect("http://localhost:5173/groups")
+                response.sendRedirect("/")
             } else {
                 throw NoAccessException(message = "Your Discord account is not authorized to access this resource")
             }
         } catch (exception: ApplicationException) {
-
-            println(exception.message)
-            if (exception is NoAccessException) {
-                SecurityContextHolder.clearContext()
-                request.session.invalidate()
-            }
+            SecurityContextHolder.clearContext()
+            request.session.invalidate()
 
             failureHandler.onAuthenticationFailure(
                 request,
