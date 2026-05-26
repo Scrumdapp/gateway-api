@@ -18,8 +18,7 @@ import java.time.Instant
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class ScrumdappUser(
-    val id: Long,
-    val role: String,
+    val id: Long
 )
 
 @Service
