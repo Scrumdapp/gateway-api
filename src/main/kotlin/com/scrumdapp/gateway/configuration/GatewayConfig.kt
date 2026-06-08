@@ -59,6 +59,11 @@ class GatewayConfig {
                     .before(uri(services.getUrl("invites")))
                     .build()
                 )
+                .add(route("trends")
+                    .route(path("/api/trends/**"), http())
+                    .before(uri(services.getUrl("trends")))
+                    .build()
+                )
 
             .before(rewritePath("/api/(?<segment>.*)", $$"/${segment}"))
             .build()
