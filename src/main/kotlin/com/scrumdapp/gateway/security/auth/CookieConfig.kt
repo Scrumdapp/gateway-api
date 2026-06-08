@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 
 @Configuration
 class CookieConfig(
-    @Value($$"${SESSION_LIFETIME}") private val sessionAge: Int = 3600 * 24 * 14 // default 2 weeks
+    @Value($$"${SESSION_LIFETIME:1209600}") private val sessionAge: Int // default 2 weeks
 ) {
 
     @Bean

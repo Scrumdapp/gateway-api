@@ -15,7 +15,7 @@ class AuthController(
 
     @GetMapping("/login")
     fun loginRedirect(): RedirectView {
-        return RedirectView("oauth2/authorization/discord")
+        return RedirectView("api/oauth2/authorization/discord")
     }
 
     @GetMapping("/.well-known/jwks.json")
