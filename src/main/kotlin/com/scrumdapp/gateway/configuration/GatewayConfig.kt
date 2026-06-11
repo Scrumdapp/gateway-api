@@ -28,7 +28,8 @@ class GatewayConfig {
         val passportInvalidationFilter = PassportInvalidationFilter(
             mapOf(
                 "/api/invites/{id}/accept" to listOf(HttpMethod.POST),
-                "/api/users/{id}" to listOf(HttpMethod.POST, HttpMethod.PATCH)
+                "/api/users/{id}" to listOf(HttpMethod.POST, HttpMethod.PATCH),
+                "/api/groups" to listOf(HttpMethod.POST)
             ),
         )
 
@@ -44,6 +45,7 @@ class GatewayConfig {
                 )
                 .add(route("groups")
                     .route(path("/api/groups/**"), http())
+                    .filter(passportInvalidationFilter.invalidatePassport())
                     .before(uri(services.getUrl("groups")))
                     .build()
                 )
