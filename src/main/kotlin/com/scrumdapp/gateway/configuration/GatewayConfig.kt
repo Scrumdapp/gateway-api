@@ -21,6 +21,7 @@ class GatewayConfig {
     @Bean
     fun gatewayRoutes(
         passportFilters: PassportFilters,
+        utilFilters: GatewayUtilityFilters,
         services: ServiceProperties
     ): RouterFunction<ServerResponse> {
 
@@ -29,12 +30,13 @@ class GatewayConfig {
             mapOf(
                 "/api/invites/{id}/accept" to listOf(HttpMethod.POST),
                 "/api/users/{id}" to listOf(HttpMethod.POST, HttpMethod.PATCH),
-                "/api/groups" to listOf(HttpMethod.POST)
+                "/api/groups" to listOf(HttpMethod.POST),
             ),
         )
 
         val routes: RouterFunction<ServerResponse> =
             route()
+                .filter(utilFilters.blockActuatorRequests())
                 .filter(passportFilters.insertPassport())
 
                 .add(route("checkpoints")
