@@ -14,14 +14,12 @@ class PassportInvalidationFilter(
     fun invalidatePassport(): HandlerFilterFunction<ServerResponse, ServerResponse> {
 
         return HandlerFilterFunction { req: ServerRequest, next: HandlerFunction<ServerResponse> ->
-
             val res = next.handle(req)
             val session = req.session() ?: return@HandlerFilterFunction res
 
             if (passportRevokePaths.containsKey(req.path()) && passportRevokePaths[req.path()]?.contains(req.method()) == true) {
-                session.removeAttribute("JWT_AC_TOKEN")
+                session.removeAttribute("PASSPORT")
             }
-
             res
         }
     }

@@ -36,6 +36,7 @@ class GatewayConfig {
 
         val routes: RouterFunction<ServerResponse> =
             route()
+                .filter(passportInvalidationFilter.invalidatePassport())
                 .filter(utilFilters.blockActuatorRequests())
                 .filter(passportFilters.insertPassport())
 
@@ -47,19 +48,16 @@ class GatewayConfig {
                 )
                 .add(route("groups")
                     .route(path("/api/groups/**"), http())
-                    .filter(passportInvalidationFilter.invalidatePassport())
                     .before(uri(services.getUrl("groups")))
                     .build()
                 )
                 .add(route("users")
                     .route(path("api/users/**"), http())
-                    .filter(passportInvalidationFilter.invalidatePassport())
                     .before(uri(services.getUrl("users")))
                     .build()
                 )
                 .add(route("invites")
                     .route(path("api/invites/**"), http())
-                    .filter(passportInvalidationFilter.invalidatePassport())
                     .before(uri(services.getUrl("invites")))
                     .build()
                 )
