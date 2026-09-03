@@ -37,9 +37,7 @@ class AuthCallbackHandler(
             }
 
             val userId = userRegistrationService.handleLogin(email, groups)
-
-            println("logged in succesfully")
-
+            
             val session = request.getSession(true)
             session.setAttribute("userId", userId)
 
