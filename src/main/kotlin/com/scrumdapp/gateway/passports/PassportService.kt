@@ -1,7 +1,7 @@
 package com.scrumdapp.gateway.passports
 
 import com.scrumdapp.gateway.security.jwt.JwtService
-import com.scrumdapp.gateway.services.DownstreamRequestService
+import com.scrumdapp.gateway.userRegistration.DownstreamRequestService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import java.time.Instant

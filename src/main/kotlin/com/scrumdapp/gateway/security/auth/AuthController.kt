@@ -13,7 +13,7 @@ class AuthController(
 
     @GetMapping("/login")
     fun loginRedirect(): RedirectView {
-        return RedirectView("api/oauth2/authorization/discord")
+        return RedirectView("api/oauth2/authorization/keycloak")
     }
 
     @GetMapping("/.well-known/jwks.json")
