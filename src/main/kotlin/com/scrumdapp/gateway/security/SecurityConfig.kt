@@ -35,7 +35,7 @@ class SecurityConfig(
                         endpoint.baseUri("/api/oauth2/code/*")
                     }
                     .successHandler(authenticationSuccessHandler)
-//                    .failureHandler(authenticationFailureHandler)
+                    .failureHandler(authenticationFailureHandler)
             }
             .logout {
                 it
