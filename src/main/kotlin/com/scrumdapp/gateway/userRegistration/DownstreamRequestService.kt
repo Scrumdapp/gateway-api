@@ -1,8 +1,7 @@
-package com.scrumdapp.gateway.services
+package com.scrumdapp.gateway.userRegistration
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.scrumdapp.gateway.ServiceProperties
-import com.scrumdapp.gateway.discordUser.UpsertUser
 import com.scrumdapp.gateway.passports.PassportContent
 import com.scrumdapp.gateway.passports.PassportToken
 import com.scrumdapp.gateway.security.jwt.JwtService
