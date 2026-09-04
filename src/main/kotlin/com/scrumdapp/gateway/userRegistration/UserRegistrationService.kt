@@ -15,10 +15,10 @@ class UserRegistrationService(
     private val requestService: DownstreamRequestService
 ) {
 
-    fun handleLogin(email: String, groups: ArrayList<String>): Long {
+    fun handleLogin(email: String, groups: ArrayList<String>, name: String): Long {
         val body = UpsertUser(
             email = email,
-            name = getName(email),
+            name = name,
             role = getRole(groups),
             avatar = null,
         )
@@ -35,15 +35,5 @@ class UserRegistrationService(
         } else {
             throw NoAccessException(message="No valid role provided")
         }
-    }
-
-    private fun getName(email: String): String {
-        var name = email.trim().split("@").first()
-        name.replace(".", " ")
-
-        val re = Regex("[^A-Za-z ]")
-        name = re.replace(name, "")
-
-        return name
     }
 }

@@ -4,6 +4,11 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.AuthenticationException
 
+class BadRequestException(
+    override val code: HttpStatus = HttpStatus.BAD_REQUEST,
+    override val message: String = "Bad Request"
+): ApplicationException(code, message)
+
 class NotAuthorizedException(
     override val code: HttpStatus = HttpStatus.UNAUTHORIZED,
     override val message: String = "Not authorized",

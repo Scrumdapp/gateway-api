@@ -2,6 +2,7 @@ package com.scrumdapp.gateway.security.auth
 
 import com.scrumdapp.gateway.exceptions.ApplicationAuthenticationException
 import com.scrumdapp.gateway.exceptions.ApplicationException
+import com.scrumdapp.gateway.exceptions.BadRequestException
 import com.scrumdapp.gateway.exceptions.NotAuthorizedException
 import com.scrumdapp.gateway.userRegistration.UserRegistrationService
 import jakarta.servlet.http.HttpServletRequest
@@ -29,14 +30,11 @@ class AuthCallbackHandler(
                 throw NotAuthorizedException(message = "You're not authorized to access this resource")
             }
 
-            val groups = principal.getAttribute<ArrayList<String>>("groups")
-            val email = principal.getAttribute<String>("preferred_username")
+            val groups = principal.getAttribute<ArrayList<String>>("groups") ?: throw BadRequestException(message = "Authentication token doesn't contain userGroup scope")
+            val email = principal.getAttribute<String>("email") ?: throw BadRequestException(message = "Authentication token doesn't contain profile scope")
+            val name = principal.getAttribute<String>("name") ?: throw BadRequestException(message = "Authentication token doesn't contain profile scope")
 
-            if (groups.isNullOrEmpty() || email.isNullOrEmpty()) {
-                throw NotAuthorizedException(message = "You're not authorized to access this resource")
-            }
-
-            val userId = userRegistrationService.handleLogin(email, groups)
+            val userId = userRegistrationService.handleLogin(email, groups, name)
             
             val session = request.getSession(true)
             session.setAttribute("userId", userId)
