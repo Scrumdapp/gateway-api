@@ -38,7 +38,11 @@ class SecurityConfig(
                     .failureHandler(authenticationFailureHandler)
             }
             .logout {
-                it.logoutUrl("/api/oauth2/logout")
+                it
+                    .logoutUrl("/api/oauth2/logout")
+                    .invalidateHttpSession(true)
+                    .clearAuthentication(true)
+                    .deleteCookies("SCRUMCELL")
             }
             .exceptionHandling { h ->
                 h.authenticationEntryPoint(customAuthenticationEntryPoint)
