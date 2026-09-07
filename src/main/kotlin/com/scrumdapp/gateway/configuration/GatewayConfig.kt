@@ -36,7 +36,7 @@ class GatewayConfig {
 
         val routes: RouterFunction<ServerResponse> =
             route()
-                .filter(passportInvalidationFilter.invalidatePassport())
+                .filter(passportInvalidationFilter.invalidatePassportCheck())
                 .filter(utilFilters.blockActuatorRequests())
                 .filter(passportFilters.insertPassport())
 
