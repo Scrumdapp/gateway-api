@@ -28,10 +28,10 @@ class UserRegistrationService(
     }
 
     private fun getRole(groups: ArrayList<String>): String {
-        return if (groups.contains("hu_students")) {
-            "student"
-        } else if (groups.contains("hu_teachers")) {
+        return if (groups.contains("hu_teachers")) {
             "coach"
+        } else if (groups.contains("hu_students")) {
+            "student"
         } else {
             throw NoAccessException(message="No valid role provided")
         }
