@@ -1,9 +1,13 @@
 package com.scrumdapp.gateway.security.auth
 
+import jakarta.servlet.ServletContext
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.web.servlet.ServletContextInitializer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.session.SessionRepository
+import org.springframework.session.web.http.SessionRepositoryFilter
+
 
 @Configuration
 class CookieConfig(

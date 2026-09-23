@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component
 @Component
 class AuthCallbackHandler(
     private val userRegistrationService: UserRegistrationService,
-    private val failureHandler: AuthenticationFailureHandler
+    private val failureHandler: AuthenticationFailureHandler,
 ) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
         val oauth2Auth = authentication as OAuth2AuthenticationToken
@@ -34,10 +34,20 @@ class AuthCallbackHandler(
             val email = principal.getAttribute<String>("email") ?: throw BadRequestException(message = "Authentication token doesn't contain profile scope")
             val name = principal.getAttribute<String>("name") ?: throw BadRequestException(message = "Authentication token doesn't contain profile scope")
 
-            val userId = userRegistrationService.handleLogin(email, groups, name)
+//            val userId = userRegistrationService.handleLogin(email, groups, name)
             
             val session = request.getSession(true)
-            session.setAttribute("userId", userId)
+            session.setAttribute("userId", 1)
+
+            val newPrincipal = GatewayAuthentication(AuthPrincipal(
+                1, setOf("STUDENT"),
+            ), authentication.authorities)
+
+            SecurityContextHolder.getContext().authentication = newPrincipal
+
+            println("attributes: ${session.attributeNames.toList()}")
+
+            println("Principal: ${SecurityContextHolder.getContext().authentication?.principal}")
 
             response.sendRedirect("/")
         } catch (ex: ApplicationException) {
