@@ -18,12 +18,8 @@ class PassportFilters(
         return HandlerFilterFunction { req: ServerRequest, next: HandlerFunction<ServerResponse> ->
             val session = req.session() ?: return@HandlerFilterFunction next.handle(req)
 
-
             val userId = session.getAttribute("userId") as? Long
-
-            println("userId = $userId, sessionAttributes = ${session.getAttribute("userId")}")
-
-            if (userId == null) throw NotAuthorizedException(message = "Not authorized, please log in")
+                ?: throw NotAuthorizedException(message = "Not authorized, please log in")
 
             val token = passportService.getPassportToken(userId)
 

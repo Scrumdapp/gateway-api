@@ -3,7 +3,6 @@ package com.scrumdapp.gateway.userRegistration
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.scrumdapp.gateway.ServiceProperties
 import com.scrumdapp.gateway.passports.PassportContent
-import com.scrumdapp.gateway.passports.GatewayToken
 import com.scrumdapp.gateway.security.jwt.JwtService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
@@ -19,6 +18,15 @@ import java.time.Instant
 data class ScrumdappUser(
     val id: Long
 )
+
+data class GatewayToken(
+    val token: String,
+    val expiresAt: Instant
+) {
+    fun isExpired(): Boolean {
+        return Instant.now().isAfter(expiresAt)
+    }
+}
 
 @Service
 class DownstreamRequestService(
