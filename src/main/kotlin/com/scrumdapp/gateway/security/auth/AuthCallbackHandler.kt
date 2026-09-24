@@ -3,6 +3,7 @@ package com.scrumdapp.gateway.security.auth
 import com.scrumdapp.gateway.exceptions.ApplicationAuthenticationException
 import com.scrumdapp.gateway.exceptions.ApplicationException
 import com.scrumdapp.gateway.exceptions.BadRequestException
+import com.scrumdapp.gateway.exceptions.ExceptionService
 import com.scrumdapp.gateway.exceptions.NotAuthorizedException
 import com.scrumdapp.gateway.userRegistration.UserRegistrationService
 import jakarta.servlet.http.HttpServletRequest
@@ -17,15 +18,13 @@ import org.springframework.stereotype.Component
 @Component
 class AuthCallbackHandler(
     private val userRegistrationService: UserRegistrationService,
-    private val failureHandler: AuthenticationFailureHandler,
+    private val exceptionService: ExceptionService,
 ) : AuthenticationSuccessHandler {
     override fun onAuthenticationSuccess(request: HttpServletRequest, response: HttpServletResponse, authentication: Authentication) {
         val oauth2Auth = authentication as OAuth2AuthenticationToken
-
         val principal = oauth2Auth.principal
 
         try {
-
             if (principal == null || principal.getAttribute<Boolean>("email_verified") == false) {
                 throw NotAuthorizedException(message = "You're not authorized to access this resource")
             }
@@ -41,14 +40,12 @@ class AuthCallbackHandler(
 
 
             response.sendRedirect("/")
-        } catch (ex: ApplicationException) {
+        } catch (ex: Exception) {
             invalidateSession(request)
 
-            failureHandler.onAuthenticationFailure(
-                request,
-                response,
-                ApplicationAuthenticationException(ex)
-            )
+            exceptionService.logException(ex, request)
+            val body = exceptionService.mapException(ex)
+            exceptionService.returnException(response, body)
         }
     }
 

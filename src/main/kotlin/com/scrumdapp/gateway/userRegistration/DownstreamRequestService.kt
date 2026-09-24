@@ -59,29 +59,25 @@ class DownstreamRequestService(
 
         val reqBuilder = builder().baseUrl(baseUrl).build()
 
-        try {
-            val reqSpec = reqBuilder.method(method)
-                .uri(uri)
-                .header("Authorization", "Bearer ${jwtToken.token}")
-                .accept(MediaType.APPLICATION_JSON)
 
-            val resSpec = if (body != null && method in listOf(HttpMethod.PATCH, HttpMethod.POST)) {
-                reqSpec.body(body)
-            } else {
-                reqSpec
-            }
+        val reqSpec = reqBuilder.method(method)
+            .uri(uri)
+            .header("Authorization", "Bearer ${jwtToken.token}")
+            .accept(MediaType.APPLICATION_JSON)
 
-            val res = resSpec.retrieve().toEntity<String>()
+        val resSpec = if (body != null && method in listOf(HttpMethod.PATCH, HttpMethod.POST)) {
+            reqSpec.body(body)
+        } else {
+            reqSpec
+        }
 
-            if (res.statusCode == HttpStatus.OK) {
+        val res = resSpec.retrieve().toEntity<String>()
+
+        if (res.statusCode == HttpStatus.OK) {
             val body = res.body ?:  throw IllegalStateException("Request body is null")
             return mapper.readValue(body, classZ)
-
         } else {
             throw Exception("Request failed with status ${res.statusCode}, body: ${res.body}")
-        }
-        } catch (e: Exception) {
-            throw Exception(e)
         }
     }
 
