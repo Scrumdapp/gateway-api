@@ -3,7 +3,7 @@ package com.scrumdapp.gateway.userRegistration
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.scrumdapp.gateway.ServiceProperties
 import com.scrumdapp.gateway.passports.PassportContent
-import com.scrumdapp.gateway.passports.PassportToken
+import com.scrumdapp.gateway.passports.GatewayToken
 import com.scrumdapp.gateway.security.jwt.JwtService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
@@ -77,7 +77,7 @@ class DownstreamRequestService(
         }
     }
 
-    private fun genGatewayToken(): PassportToken {
+    private fun genGatewayToken(): GatewayToken {
 
         val expiresAt = Instant.now().plusSeconds(passportLifeTime)
         val content = PassportContent(
@@ -90,7 +90,7 @@ class DownstreamRequestService(
             claims = content.toJwtClaim()
         )
 
-        return PassportToken(token, expiresAt)
+        return GatewayToken(token, expiresAt)
     }
 
 }

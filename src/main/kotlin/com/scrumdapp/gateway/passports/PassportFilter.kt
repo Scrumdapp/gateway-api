@@ -18,20 +18,20 @@ class PassportFilters(
         return HandlerFilterFunction { req: ServerRequest, next: HandlerFunction<ServerResponse> ->
             val session = req.session() ?: return@HandlerFilterFunction next.handle(req)
 
-            var cachedToken = session.getAttribute("JWT_AC_TOKEN") as? PassportToken
 
-            val userId = session.getAttribute("userId") as? Long ?: throw NotAuthorizedException(message = "Unauthorized, please log in again")
+            val userId = session.getAttribute("userId") as? Long
 
-            if (cachedToken == null || cachedToken.isExpired()) {
-                cachedToken = passportService.generatePassport(userId)
-                session.setAttribute("JWT_AC_TOKEN", cachedToken)
-            }
+            println("userId = $userId, sessionAttributes = ${session.getAttribute("userId")}")
+
+            if (userId == null) throw NotAuthorizedException(message = "Not authorized, please log in")
+
+            val token = passportService.getPassportToken(userId)
 
             val mutatedReq = ServerRequest.from(req)
                 .headers {
                     // Session has been validated at this point in the chain
                     it.remove(HttpHeaders.COOKIE)
-                    it.setBearerAuth(cachedToken.token)
+                    it.setBearerAuth(token)
                 }
                 .build()
 
