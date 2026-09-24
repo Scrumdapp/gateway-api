@@ -1,5 +1,6 @@
 package com.scrumdapp.gateway.passports
 
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,6 +18,6 @@ class PassportController(
         @SessionAttribute userId: Long,
     ): ResponseEntity<Void> {
         passportService.invalidatePassport(userId)
-        return ResponseEntity.ok().build()
+        return ResponseEntity<Void>(HttpStatus.NO_CONTENT)
     }
 }
