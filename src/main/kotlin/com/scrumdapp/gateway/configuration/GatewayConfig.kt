@@ -52,7 +52,7 @@ class GatewayConfig {
                     .build()
                 )
                 .add(route("users")
-                    .route(path("api/users/**"), http())
+                    .route(path("api/users/@me"), http())
                     .before(uri(services.getUrl("users")))
                     .build()
                 )
