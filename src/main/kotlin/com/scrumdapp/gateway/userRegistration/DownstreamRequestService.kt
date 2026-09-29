@@ -3,7 +3,6 @@ package com.scrumdapp.gateway.userRegistration
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.scrumdapp.gateway.ServiceProperties
 import com.scrumdapp.gateway.passports.PassportContent
-import com.scrumdapp.gateway.passports.PassportToken
 import com.scrumdapp.gateway.security.jwt.JwtService
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
@@ -19,6 +18,15 @@ import java.time.Instant
 data class ScrumdappUser(
     val id: Long
 )
+
+data class GatewayToken(
+    val token: String,
+    val expiresAt: Instant
+) {
+    fun isExpired(): Boolean {
+        return Instant.now().isAfter(expiresAt)
+    }
+}
 
 @Service
 class DownstreamRequestService(
@@ -51,33 +59,29 @@ class DownstreamRequestService(
 
         val reqBuilder = builder().baseUrl(baseUrl).build()
 
-        try {
-            val reqSpec = reqBuilder.method(method)
-                .uri(uri)
-                .header("Authorization", "Bearer ${jwtToken.token}")
-                .accept(MediaType.APPLICATION_JSON)
 
-            val resSpec = if (body != null && method in listOf(HttpMethod.PATCH, HttpMethod.POST)) {
-                reqSpec.body(body)
-            } else {
-                reqSpec
-            }
+        val reqSpec = reqBuilder.method(method)
+            .uri(uri)
+            .header("Authorization", "Bearer ${jwtToken.token}")
+            .accept(MediaType.APPLICATION_JSON)
 
-            val res = resSpec.retrieve().toEntity<String>()
+        val resSpec = if (body != null && method in listOf(HttpMethod.PATCH, HttpMethod.POST)) {
+            reqSpec.body(body)
+        } else {
+            reqSpec
+        }
 
-            if (res.statusCode == HttpStatus.OK) {
+        val res = resSpec.retrieve().toEntity<String>()
+
+        if (res.statusCode == HttpStatus.OK) {
             val body = res.body ?:  throw IllegalStateException("Request body is null")
             return mapper.readValue(body, classZ)
-
         } else {
             throw Exception("Request failed with status ${res.statusCode}, body: ${res.body}")
         }
-        } catch (e: Exception) {
-            throw Exception(e)
-        }
     }
 
-    private fun genGatewayToken(): PassportToken {
+    private fun genGatewayToken(): GatewayToken {
 
         val expiresAt = Instant.now().plusSeconds(passportLifeTime)
         val content = PassportContent(
@@ -90,7 +94,7 @@ class DownstreamRequestService(
             claims = content.toJwtClaim()
         )
 
-        return PassportToken(token, expiresAt)
+        return GatewayToken(token, expiresAt)
     }
 
 }

@@ -23,7 +23,7 @@ class CustomAuthenticationFailureHandler(
         response: HttpServletResponse,
         exception: AuthenticationException
     ) {
-        exceptionService.logException(exception)
+        exceptionService.logException(exception, request)
         response.sendRedirect("/")
     }
 }
@@ -37,11 +37,8 @@ class CustomAuthenticationEntrypoint(
         response: HttpServletResponse,
         authException: AuthenticationException
     ) {
-        val body = ApiResponse(
-            code = HttpStatus.UNAUTHORIZED.value(),
-            message = "Not authorized, please log in"
-        )
-        exceptionService.returnException(response, body)
+        exceptionService.logException(authException, request)
+        exceptionService.returnException(response, ApiResponse(HttpStatus.UNAUTHORIZED.value(), "Not authorized, please log in"))
     }
 }
 
@@ -55,24 +52,7 @@ class CustomAccessDeniedHandler(
         response: HttpServletResponse,
         exception: AccessDeniedException
     ) {
-        exceptionService.logException(exception)
-        response.sendRedirect("/")
-    }
-}
-
-@RestControllerAdvice
-class ControllerExceptionHandler(
-    private val exceptionService: ExceptionService
-) {
-
-    @ExceptionHandler(Throwable::class)
-    fun handle(ex: Throwable): ResponseEntity<ApiResponse> {
-        exceptionService.logException(ex)
-
-        val body = exceptionService.mapException(ex)
-
-        return ResponseEntity
-            .status(body.code)
-            .body(body)
+        exceptionService.logException(exception, request)
+        exceptionService.returnException(response, ApiResponse(HttpStatus.FORBIDDEN.value(), "Access denied"))
     }
 }
