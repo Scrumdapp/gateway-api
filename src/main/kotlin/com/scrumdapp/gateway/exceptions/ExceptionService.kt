@@ -76,39 +76,36 @@ class ExceptionService(
             )
         }
 
-        val (code, message) = when (throwable) {
+        return when (throwable) {
             is ApplicationException ->
-                throwable.code.value() to (throwable.message ?: "Application Error")
+                ApiResponse(throwable.code.value(), (throwable.message ?: "Application Error") )
 
             is AccessDeniedException ->
-                HttpStatus.FORBIDDEN.value() to "Access Denied"
+                ApiResponse(HttpStatus.FORBIDDEN.value(), "Access Denied")
 
             is AuthenticationException ->
-                HttpStatus.UNAUTHORIZED.value() to "Not Authorized, please log in"
+                ApiResponse(HttpStatus.UNAUTHORIZED.value(),"Not Authorized, please log in")
 
             is NoResourceFoundException ->
-                HttpStatus.NOT_FOUND.value() to "Resource not found"
+                ApiResponse(HttpStatus.NOT_FOUND.value(), "Resource not found")
 
             is HttpServerErrorException ->
                 mapDownstreamErrors(throwable)
 
             is ResourceAccessException ->
-                HttpStatus.SERVICE_UNAVAILABLE.value() to "Downstream service unavailable"
+                ApiResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), "Downstream service unavailable")
 
             else -> {
-                println("Uncaught Throwable: $throwable")
-                HttpStatus.INTERNAL_SERVER_ERROR.value() to "Unknown error"
+                ApiResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), "Unknown error")
             }
         }
-
-        return ApiResponse(code, message)
     }
 
-    private fun mapDownstreamErrors(e: HttpServerErrorException): Pair<Int, String> {
+    private fun mapDownstreamErrors(e: HttpServerErrorException): ApiResponse {
         return when (e.statusCode) {
             HttpStatus.SERVICE_UNAVAILABLE ->
-                HttpStatus.SERVICE_UNAVAILABLE.value() to "Downstream service currently unavailable"
-            else -> e.statusCode.value() to e.message!!
+                ApiResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), "Downstream service currently unavailable")
+            else -> ApiResponse(e.statusCode.value(),e.message!!)
         }
     }
 }
