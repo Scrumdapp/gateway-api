@@ -6,7 +6,7 @@ import org.springframework.data.redis.core.TimeToLive
 import java.util.concurrent.TimeUnit
 
 @RedisHash("scrumdapp:passports")
-class Passport(
+data class Passport(
     @Id
     val userId: Long,
 
