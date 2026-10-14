@@ -5,6 +5,7 @@ import com.nimbusds.jose.jwk.RSAKey
 import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet
 import com.nimbusds.jose.proc.SecurityContext
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,18 +20,20 @@ class JwtConfig(
     private val jwtKeyUtils: JwtKeyUtils
 ) {
 
+    private val logger = LoggerFactory.getLogger(JwtConfig::class.java)
+
     @Profile("dev")
     @Bean
     fun devRsaKey(
         @Value($$"${JWT_SECRET}") jwtSecret: String
     ): RSAKey {
-        println("Using development generated RSA key")
+        logger.info("Using generated RSA key. Do not use this in production")
         return RSAKeyGenerator(2048).keyID(jwtSecret).generate()
     }
 
     @Bean
     fun rsaKey(): RSAKey {
-        println("Using pre-generated .pem RSA key")
+        logger.info("Using pre-generated RSA key")
 
         val privateKey = jwtKeyUtils.loadPrivateKey(privateKey)
         val publicKey = jwtKeyUtils.loadPublicKey(publicKey)

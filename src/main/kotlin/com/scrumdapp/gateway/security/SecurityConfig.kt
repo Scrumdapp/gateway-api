@@ -8,13 +8,17 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.security.web.context.DelegatingSecurityContextRepository
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository
+import org.springframework.security.web.context.RequestAttributeSecurityContextRepository
+import org.springframework.security.web.context.SecurityContextRepository
 
 @Configuration
 class SecurityConfig(
     private val customAuthenticationEntryPoint: CustomAuthenticationEntrypoint,
     private val customAccessDeniedHandler: CustomAccessDeniedHandler,
     private val authenticationSuccessHandler: AuthenticationSuccessHandler,
-    private val authenticationFailureHandler: AuthenticationFailureHandler
+    private val authenticationFailureHandler: AuthenticationFailureHandler,
 ) {
 
     @Bean
