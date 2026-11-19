@@ -66,6 +66,11 @@ class GatewayConfig {
                     .before(uri(services.getUrl("trends")))
                     .build()
                 )
+                .add(route("tribes")
+                    .route(path("/api/tribes/**"), http())
+                    .before(uri(services.getUrl("tribes")))
+                    .build()
+                )
 
             .before(rewritePath("/api/(?<segment>.*)", $$"/${segment}"))
             .build()
